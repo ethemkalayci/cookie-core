@@ -1,0 +1,66 @@
+/* ==================================================
+   COOKIE CORE — DESIGN SYSTEM
+   Cookies Studio
+   ================================================== */
+.root {
+    /* Fond principal de l'application */
+    -color-background: #13171F;
+
+    /* Fond du menu latéral (Sidebar) */
+    -color-sidebar: #1B1724;
+
+    /* Couleur principale des textes */
+    -color-text-primary: #F5F2FA;
+
+    /* Couleur de survol des boutons */
+    -color-hover: #342447;
+
+    /* Couleur d'accent : violet Cookie Core */
+    -color-accent: #7040B6;
+
+    /* Application du fond principal */
+    -fx-background-color: -color-background;
+}
+
+.sidebar {
+    -fx-background-color: -color-sidebar;
+    -fx-background-radius: 1em;
+    -fx-padding: 1.5em;
+}
+
+.sidebar .label {
+    -fx-text-fill: -color-text-primary;
+    -fx-font-size: 1.4em;
+    -fx-font-weight: bold;
+}
+
+.sidebar-separator .line {
+    -fx-border-color: #7040B6;
+    -fx-border-width: 1;
+}
+
+.sidebar .button {
+    -fx-graphic-text-gap: 10px;
+    -fx-background-color: transparent;
+    -fx-text-fill: -color-text-primary;
+
+    -fx-alignment: CENTER_LEFT;
+    -fx-font-size: 1.1em;
+
+    -fx-pref-height: 3.1em;
+    -fx-padding: 0 1em 0 1em;
+
+    -fx-background-radius: 0.7em;
+    -fx-cursor: hand;
+}
+
+.sidebar .button:hover {
+    -fx-background-color: -color-hover;
+}
+
+.sidebar .button.active {
+    -fx-background-color: -color-accent;
+
+    -fx-pref-height: 3.4em;
+    -fx-font-weight: bold;
+}
