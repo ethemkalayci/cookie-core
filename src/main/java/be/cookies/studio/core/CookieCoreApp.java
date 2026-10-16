@@ -90,7 +90,6 @@ public class CookieCoreApp extends Application {
     }
 
     private void afficherInterfacePrincipale(Stage stage) {
-
         try {
             FXMLLoader loader = new FXMLLoader(
                     Objects.requireNonNull(

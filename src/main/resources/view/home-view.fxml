@@ -1,16 +1,133 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
+<AnchorPane prefHeight="800.0"
+            prefWidth="1000.0"
+            stylesheets="@../css/style.css"
+            xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="be.cookies.studio.core.controller.HomeController">
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="be.cookies.studio.core.controller.HomeController">
    <children>
-      <Label layoutX="227.0" layoutY="166.0" text="Acceuil">
-         <font>
-            <Font size="46.0" />
-         </font>
-      </Label>
+      <ScrollPane fx:id="homeScrollPane"
+                  fitToWidth="true"
+                  hbarPolicy="NEVER"
+                  styleClass="home-scroll"
+                  AnchorPane.bottomAnchor="0.0"
+                  AnchorPane.leftAnchor="0.0"
+                  AnchorPane.rightAnchor="0.0"
+                  AnchorPane.topAnchor="0.0">
+
+         <content>
+            <VBox spacing="0.0">
+               <children>
+
+                  <!-- Bannière immersive -->
+                  <StackPane fx:id="bannerPane"
+                             prefHeight="600.0"
+                             styleClass="home-banner">
+
+                     <children>
+
+                        <!-- Dégradé diagonal -->
+                        <Region mouseTransparent="true"
+                                styleClass="banner-gradient" />
+
+                        <!-- Fondu vertical vers les actualités -->
+                        <Region mouseTransparent="true"
+                                prefHeight="180.0"
+                                maxHeight="-Infinity"
+                                styleClass="banner-bottom-fade"
+                                StackPane.alignment="BOTTOM_CENTER" />
+
+                        <!-- Message de bienvenue -->
+                        <Label styleClass="home-welcome"
+                               text="Bienvenue, Player !"
+                               StackPane.alignment="TOP_LEFT">
+                           <StackPane.margin>
+                              <Insets left="52.0" top="42.0" />
+                           </StackPane.margin>
+                        </Label>
+
+                        <!-- Informations de l'instance -->
+                        <VBox alignment="CENTER_LEFT"
+                              maxHeight="-Infinity"
+                              maxWidth="-Infinity"
+                              spacing="10.0"
+                              styleClass="home-instance-info"
+                              StackPane.alignment="CENTER_LEFT">
+
+                           <children>
+                              <Label styleClass="home-instance-subtitle"
+                                     text="DERNIÈRE INSTANCE LANCÉE" />
+
+                              <Label styleClass="home-instance-title"
+                                     text="Instance Name"
+                                     wrapText="true" />
+
+                              <Button mnemonicParsing="false"
+                                      styleClass="home-play-button"
+                                      text="JOUER">
+                                 <VBox.margin>
+                                    <Insets top="24.0" />
+                                 </VBox.margin>
+                              </Button>
+                           </children>
+
+                           <StackPane.margin>
+                              <Insets left="52.0" />
+                           </StackPane.margin>
+                        </VBox>
+
+                        <!-- Notifications -->
+                        <Button fx:id="newsButton"
+                                accessibleText="Actualités"
+                                mnemonicParsing="false"
+                                styleClass="home-notification-button"
+                                text="🔔"
+                                StackPane.alignment="TOP_RIGHT">
+
+                           <StackPane.margin>
+                              <Insets right="38.0" top="36.0" />
+                           </StackPane.margin>
+                        </Button>
+
+                     </children>
+                  </StackPane>
+
+                  <!-- Section Actualités -->
+                  <VBox fx:id="newsSection"
+                        spacing="14.0"
+                        styleClass="home-news">
+
+                     <padding>
+                        <Insets bottom="80.0"
+                                left="52.0"
+                                right="48.0"
+                                top="55.0" />
+                     </padding>
+
+                     <children>
+                        <Label styleClass="home-news-title"
+                               text="ACTUALITÉS COOKIES STUDIO" />
+
+                        <Label styleClass="home-news-description"
+                               text="Les prochaines annonces apparaîtront ici."
+                               wrapText="true" />
+                     </children>
+                  </VBox>
+
+               </children>
+            </VBox>
+         </content>
+      </ScrollPane>
    </children>
 </AnchorPane>

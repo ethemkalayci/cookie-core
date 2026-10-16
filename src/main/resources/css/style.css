@@ -64,3 +64,172 @@
     -fx-pref-height: 3.4em;
     -fx-font-weight: bold;
 }
+
+.home-banner{
+    -fx-background-image: url(../images/banners/mc.jpg);
+    -fx-background-size: cover;
+    -fx-background-position: center;
+}
+
+
+.banner-gradient {
+    -fx-background-color: linear-gradient(
+            from 0% 100% to 100% 0%,
+            rgba(11, 13, 22, 0.92) 0%,
+            rgba(11, 13, 22, 0.55) 35%,
+            rgba(11, 13, 22, 0.18) 70%,
+            rgba(11, 13, 22, 0.00) 100%
+    );
+}
+
+
+/* Fond principal de HomeView */
+.home-scroll {
+    -fx-background-color: #13171F;
+    -fx-background-insets: 0;
+}
+
+/* Fond intérieur du ScrollPane */
+.home-scroll > .viewport {
+    -fx-background-color: #13171F;
+}
+
+
+/* =========================================
+   HOME VIEW — BANNIÈRE
+   ========================================= */
+
+.home-banner {
+    -fx-background-image: url("../images/banners/mc.jpg");
+    -fx-background-size: cover;
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+}
+
+.banner-gradient {
+    -fx-background-color: linear-gradient(
+            from 0% 100% to 100% 0%,
+            rgba(11, 13, 22, 0.94) 0%,
+            rgba(11, 13, 22, 0.72) 35%,
+            rgba(11, 13, 22, 0.20) 75%,
+            rgba(11, 13, 22, 0.00) 100%
+    );
+}
+
+/* =========================================
+   HOME VIEW — TEXTES
+   ========================================= */
+
+.home-welcome {
+    -fx-font-size: 27px;
+    -fx-font-weight: normal;
+    -fx-text-fill: #FFFFFF;
+    -fx-effect: dropshadow(
+            gaussian, rgba(0, 0, 0, 0.55),
+            10, 0.2, 0, 2
+    );
+}
+
+.home-instance-subtitle {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #CDBCE8;
+}
+
+.home-instance-title {
+    -fx-font-size: 54px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #FFFFFF;
+    -fx-effect: dropshadow(
+            gaussian, rgba(0, 0, 0, 0.6),
+            16, 0.2, 0, 3
+    );
+}
+
+/* =========================================
+   HOME VIEW — BOUTON JOUER
+   ========================================= */
+
+.home-play-button {
+    -fx-background-color: #7040B6;
+    -fx-background-radius: 10px;
+
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+
+    -fx-padding: 14px 38px;
+    -fx-cursor: hand;
+
+    -fx-effect: dropshadow(
+            gaussian, rgba(30, 10, 55, 0.6),
+            18, 0.25, 0, 6
+    );
+}
+
+.home-play-button:hover {
+    -fx-background-color: #8655D0;
+}
+
+.home-play-button:pressed {
+    -fx-background-color: #593093;
+}
+
+/* =========================================
+   HOME VIEW — NOTIFICATIONS
+   ========================================= */
+
+.home-notification-button {
+    -fx-background-color: rgba(15, 15, 25, 0.70);
+    -fx-background-radius: 50%;
+
+    -fx-border-color: rgba(255, 255, 255, 0.20);
+    -fx-border-radius: 50%;
+
+    -fx-text-fill: white;
+    -fx-font-size: 19px;
+
+    -fx-min-width: 48px;
+    -fx-min-height: 48px;
+    -fx-pref-width: 48px;
+    -fx-pref-height: 48px;
+
+    -fx-cursor: hand;
+}
+
+.home-notification-button:hover {
+    -fx-background-color: rgba(112, 64, 182, 0.85);
+}
+
+/* =========================================
+   HOME VIEW — ACTUALITÉS
+   ========================================= */
+
+.home-news {
+    -fx-background-color: #13171F;
+}
+
+.home-news-title {
+    -fx-text-fill: white;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.home-news-description {
+    -fx-text-fill: #AFAABB;
+    -fx-font-size: 14px;
+}
+
+
+/* Transition douce entre la bannière et les actualités */
+
+.banner-bottom-fade {
+    -fx-background-color: linear-gradient(
+            from 0% 0% to 0% 100%,
+            rgba(19, 23, 31, 0.00) 0%,
+            rgba(19, 23, 31, 0.18) 25%,
+            rgba(19, 23, 31, 0.45) 55%,
+            rgba(19, 23, 31, 0.78) 80%,
+            #13171F 100%
+    );
+}
