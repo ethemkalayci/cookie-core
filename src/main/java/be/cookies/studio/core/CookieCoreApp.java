@@ -102,15 +102,14 @@ public class CookieCoreApp extends Application {
 
             Parent root = loader.load();
 
-            Scene scene = new Scene(root, 900, 600);
-
+            Scene scene = new Scene(root,1200,900);
+            stage.setMaximized(true);
             stage.setScene(scene);
             stage.show();
 
         } catch (Exception e) {
             throw new RuntimeException(
-                    "Impossible de charger l'interface principale",
-                    e
+                    "Impossible de charger l'interface principale", e
             );
         }
     }

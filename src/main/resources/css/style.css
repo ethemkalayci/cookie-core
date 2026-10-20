@@ -233,3 +233,50 @@
             #13171F 100%
     );
 }
+
+
+/* Conteneur principal */
+.news-card {
+    -fx-background-color: #171C26;
+    -fx-background-radius: 14px;
+    -fx-border-color: #303544;
+    -fx-border-width: 1px;
+    -fx-border-radius: 14px;
+    -fx-padding: 0;
+}
+
+/* Contenu sous l'image */
+.news-card-content {
+    -fx-padding: 16px;
+}
+
+/* Catégorie */
+.news-card-category {
+    -fx-text-fill: #B895FF;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+/* Titre */
+.news-card-title {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+/* Description */
+.news-card-description {
+    -fx-text-fill: #A9AFBE;
+    -fx-font-size: 13px;
+}
+
+/* Date */
+.news-card-date {
+    -fx-text-fill: #8E94A5;
+    -fx-font-size: 11px;
+}
+
+/* Séparateur */
+.news-card-separator .line {
+    -fx-border-color: #303544;
+}
