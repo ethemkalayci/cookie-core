@@ -1,10 +1,15 @@
 package be.cookies.studio.core.controller;
 
+import be.cookies.studio.core.model.NewsItem;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import org.girod.javafx.svgimage.SVGLoader;
@@ -15,20 +20,55 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 
 
+import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
 
 public class HomeController {
     @FXML
     private Button newsButton;
-
     @FXML
     private TilePane newsGrid;
 
     @FXML
     private void initialize() {
         newsButton.setGraphic(loadIcon("notification.svg"));
+        loadNews();
         initializeNewsCardClips();
     }
+
+
+    private void loadNews() {
+        NewsItem item = new NewsItem(
+                "/images/banners/news/test2.jpg",
+                "Annonce",
+                "Ajout des annonces dynamique",
+                "Les annonces sont créées via une classe métier et ne sont plus créées en dur dans le fichier FXML.",
+                LocalDate.now()
+        );
+
+        URL ressource = getClass().getResource("/view/newsCard.fxml");
+
+        if (ressource == null) {
+            System.err.println("Le fichier cible n'est pas trouvé");
+            return;
+        }
+
+        FXMLLoader file = new FXMLLoader(ressource);
+
+        try {
+            VBox card = file.load();
+            NewsCardController newsCardController = file.getController();
+            newsCardController.setNewsItem(item);
+
+            applyRoundedClip(card);
+
+            newsGrid.getChildren().add(card);
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
     private void applyRoundedClip(VBox card) {
