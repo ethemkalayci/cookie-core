@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox maxHeight="-Infinity" maxWidth="280.0" minHeight="380.0" minWidth="280.0" prefHeight="380.0" prefWidth="280.0" styleClass="news-card" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="be.cookies.studio.core.controller.NewsCardController">
+   <children>
+      <ImageView fx:id="newsImage" fitWidth="280.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/banners/news/actuTest.jpg" />
+         </image>
+      </ImageView>
+      <VBox spacing="10.0" styleClass="news-card-content">
+         <children>
+            <Label fx:id="categorieLabel" styleClass="news-card-category" text="Catégorie" />
+            <Label fx:id="titreLabel" styleClass="news-card-title" text="Titre" wrapText="true" />
+            <Label fx:id="descriptionLabel" styleClass="news-card-description" text="Description" wrapText="true" />
+            <Separator styleClass="news-card-separator" />
+            <Label fx:id="dateLabel" alignment="CENTER" maxWidth="1.7976931348623157E308" styleClass="news-card-date" text="Date" />
+         </children>
+      </VBox>
+   </children>
+</VBox>
