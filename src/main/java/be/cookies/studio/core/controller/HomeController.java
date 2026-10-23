@@ -1,34 +1,37 @@
 package be.cookies.studio.core.controller;
 
 import be.cookies.studio.core.model.NewsItem;
-import javafx.beans.binding.Bindings;
+import be.cookies.studio.core.service.NewsService;
+import javafx.application.HostServices;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import org.girod.javafx.svgimage.SVGLoader;
-import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
-
-
+import be.cookies.studio.core.service.NewsLoadResult;
 import java.io.IOException;
 import java.net.URL;
-import java.time.LocalDate;
+import java.util.List;
 
 public class HomeController {
     @FXML
     private Button newsButton;
     @FXML
     private TilePane newsGrid;
+    @FXML
+    private Label newsStatusLabel;
+
+    private HostServices hostServices;
+
+    public void setHostServices(HostServices hostServices) {
+        this.hostServices = hostServices;
+    }
 
     @FXML
     private void initialize() {
@@ -38,38 +41,114 @@ public class HomeController {
     }
 
 
+    private void showNewsStatus(String message) {
+        newsStatusLabel.setText(message);
+        newsStatusLabel.setVisible(true);
+        newsStatusLabel.setManaged(true);
+    }
+
+    private void hideNewsStatus() {
+        newsStatusLabel.setVisible(false);
+        newsStatusLabel.setManaged(false);
+    }
+
     private void loadNews() {
-        NewsItem item = new NewsItem(
-                "/images/banners/news/test2.jpg",
-                "Annonce",
-                "Ajout des annonces dynamique",
-                "Les annonces sont créées via une classe métier et ne sont plus créées en dur dans le fichier FXML.",
-                LocalDate.now()
+
+        showNewsStatus("Chargement des actualités…");
+
+        NewsService newsService = new NewsService();
+
+        Task<NewsLoadResult> task = new Task<>() {
+
+            @Override
+            protected NewsLoadResult call() throws Exception {
+                return newsService.loadNews();
+            }
+        };
+
+
+        task.setOnSucceeded(event -> {
+
+            NewsLoadResult result = task.getValue();
+
+            displayNews(result.news());
+
+            if (result.news().isEmpty()) {
+
+                showNewsStatus("Aucune actualité disponible.");
+
+            } else if (result.fromCache()) {
+
+                showNewsStatus(
+                        "Mode hors ligne : dernières actualités enregistrées."
+                );
+
+            } else {
+
+                hideNewsStatus();
+            }
+        });
+
+
+        task.setOnFailed(event -> {
+
+            newsGrid.getChildren().clear();
+
+            showNewsStatus(
+                    "Impossible de récupérer les actualités."
+            );
+
+            System.err.println(
+                    "Échec du chargement des actualités :"
+            );
+
+            task.getException().printStackTrace();
+        });
+
+        Thread thread = new Thread(
+                task,
+                "cookie-core-news-loader"
         );
+
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+
+    private void displayNews(List<NewsItem> news) {
+
+        newsGrid.getChildren().clear();
 
         URL ressource = getClass().getResource("/view/newsCard.fxml");
 
         if (ressource == null) {
-            System.err.println("Le fichier cible n'est pas trouvé");
+            System.err.println("newsCard.fxml introuvable !");
             return;
         }
 
-        FXMLLoader file = new FXMLLoader(ressource);
+        for (NewsItem item : news) {
 
-        try {
-            VBox card = file.load();
-            NewsCardController newsCardController = file.getController();
-            newsCardController.setNewsItem(item);
+            FXMLLoader loader = new FXMLLoader(ressource);
 
-            applyRoundedClip(card);
+            try {
+                VBox card = loader.load();
 
-            newsGrid.getChildren().add(card);
-        }catch (IOException e) {
-            e.printStackTrace();
+                NewsCardController controller = loader.getController();
+
+                controller.setHostServices(hostServices);
+                controller.setNewsItem(item);
+
+                applyRoundedClip(card);
+
+                newsGrid.getChildren().add(card);
+            } catch (IOException e) {
+                System.err.println(
+                        "Erreur lors de l'affichage : " + item.getTitre()
+                );
+                e.printStackTrace();
+            }
         }
     }
-
-
 
     private void applyRoundedClip(VBox card) {
         Rectangle clip = new Rectangle();

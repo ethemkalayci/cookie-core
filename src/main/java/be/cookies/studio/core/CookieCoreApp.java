@@ -1,6 +1,6 @@
 
 package be.cookies.studio.core;
-
+import be.cookies.studio.core.controller.ShellController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -101,7 +101,8 @@ public class CookieCoreApp extends Application {
             );
 
             Parent root = loader.load();
-
+            ShellController shellController = loader.getController();
+            shellController.setHostServices(getHostServices());
             Scene scene = new Scene(root,1200,900);
             stage.setMaximized(true);
             stage.setScene(scene);

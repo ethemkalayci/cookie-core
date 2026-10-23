@@ -280,3 +280,43 @@
 .news-card-separator .line {
     -fx-border-color: #303544;
 }
+
+
+/* ===================================
+   NEWS CARD — BOUTON VOIR
+   =================================== */
+
+.news-card-view-button {
+    -fx-background-color: #7040B6;
+    -fx-text-fill: #F5F2FA;
+
+    -fx-font-size: 0.85em;
+    -fx-font-weight: bold;
+
+    -fx-padding: 0.65em 1.3em;
+    -fx-background-radius: 0.65em;
+
+    -fx-border-color: transparent;
+    -fx-border-radius: 0.65em;
+    -fx-border-width: 0.08em;
+
+    -fx-cursor: hand;
+}
+
+/* Survol */
+.news-card-view-button:hover {
+    -fx-background-color: #8858D0;
+    -fx-text-fill: white;
+}
+
+/* Clic */
+.news-card-view-button:pressed {
+    -fx-background-color: #593095;
+    -fx-scale-x: 0.96;
+    -fx-scale-y: 0.96;
+}
+
+/* Navigation au clavier */
+.news-card-view-button:focused {
+    -fx-border-color: #B99AE9;
+}

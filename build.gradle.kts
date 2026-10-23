@@ -35,6 +35,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("com.github.hervegirod:fxsvgimage:1.2")
+    implementation("com.google.code.gson:gson:2.14.0")
 }
 
 tasks.test {

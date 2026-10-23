@@ -100,7 +100,7 @@
                         <Label styleClass="home-news-title" text="ACTUALITÉS COOKIES STUDIO" />
 
                         <!-- Description -->
-                        <Label styleClass="home-news-description" text="Les prochaines annonces apparaîtront ici." wrapText="true" />
+                        <Label fx:id="newsStatusLabel" styleClass="home-news-description" text="Les prochaines annonces apparaîtront ici." wrapText="true" />
 
 
                         <!-- ========================== -->

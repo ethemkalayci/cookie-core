@@ -2,19 +2,30 @@
 package be.cookies.studio.core.controller;
 
 import be.cookies.studio.core.model.NewsItem;
+import be.cookies.studio.core.service.NewsImageCacheService;
+import javafx.application.HostServices;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+import java.net.URI;
 import java.net.URL;
+import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 
 public class NewsCardController {
 
     private static final double IMAGE_WIDTH = 280;
     private static final double IMAGE_HEIGHT = 145;
+
+    private static final DateTimeFormatter DATE_FORMATTER =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+    private static final NewsImageCacheService IMAGE_CACHE =
+            new NewsImageCacheService();
 
     @FXML
     private ImageView newsImage;
@@ -31,71 +42,141 @@ public class NewsCardController {
     @FXML
     private Label dateLabel;
 
+    private NewsItem item;
+    private HostServices hostServices;
+
+    public void setHostServices(HostServices hostServices) {
+        this.hostServices = hostServices;
+    }
+
     public void setNewsItem(NewsItem news) {
 
-        // Mise à jour des textes
+        this.item = news;
+
         categorieLabel.setText(news.getCategorie());
         titreLabel.setText(news.getTitre());
         descriptionLabel.setText(news.getDescription());
 
-        // Mise à jour de la date
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        dateLabel.setText(news.getPublicationDate().format(formatter));
+        dateLabel.setText(
+                news.getPublicationDate().format(DATE_FORMATTER)
+        );
 
-        // Récupération de l'adresse de l'image
-        String imagePath = news.getImagePath();
-        String imageUrl;
-
-        if (imagePath.startsWith("https://")
-                || imagePath.startsWith("http://")) {
-
-            imageUrl = imagePath;
-
-        } else {
-
-            URL resource = getClass().getResource(imagePath);
-
-            if (resource == null) {
-                throw new IllegalArgumentException(
-                        "Image introuvable : " + imagePath
-                );
-            }
-
-            imageUrl = resource.toExternalForm();
-        }
-
-        // Configuration de la zone d'affichage
         newsImage.setFitWidth(IMAGE_WIDTH);
         newsImage.setFitHeight(IMAGE_HEIGHT);
         newsImage.setPreserveRatio(true);
         newsImage.setSmooth(true);
         newsImage.setViewport(null);
 
-        // Chargement de l'image en arrière-plan
-        Image image = new Image(imageUrl, true);
+        // Affichage immédiat de l'image de secours.
+        showPlaceholder();
+
+        String imageUrl = news.getImageUrl();
+
+        if (imageUrl == null || imageUrl.isBlank()) {
+            return;
+        }
+
+        // Les ressources internes ne nécessitent pas de cache.
+        if (imageUrl.startsWith("/")) {
+
+            URL resource = getClass().getResource(imageUrl);
+
+            if (resource != null) {
+                displayImage(resource.toExternalForm());
+            }
+
+            return;
+        }
+
+        // Résolution de l'image en arrière-plan.
+        IMAGE_CACHE.resolve(imageUrl).whenComplete((path, error) -> {
+
+            Platform.runLater(() -> {
+
+                // Ignorer le résultat si la carte a changé.
+                if (this.item != news) {
+                    return;
+                }
+
+                if (error != null) {
+                    System.err.println(
+                            "Image indisponible pour : "
+                                    + news.getTitre()
+                                    + " (" + error.getMessage() + ")"
+                    );
+                    return;
+                }
+
+                displayImage(path.toUri().toString());
+            });
+        });
+    }
+
+    private void showPlaceholder() {
+
+        URL resource = getClass().getResource(
+                "/images/logo/logo-core.png"
+        );
+
+        if (resource == null) {
+            System.err.println("Logo de secours introuvable !");
+            newsImage.setImage(null);
+            return;
+        }
+
+        displayImage(resource.toExternalForm(), false);
+    }
+
+    private void displayImage(String url) {
+        displayImage(url, true);
+    }
+
+    private void displayImage(String url, boolean fallbackOnError) {
+
+        final Image image;
+
+        try {
+            image = new Image(url, true);
+        } catch (IllegalArgumentException e) {
+            if (fallbackOnError) {
+                showPlaceholder();
+            }
+            return;
+        }
+
+        newsImage.setViewport(null);
         newsImage.setImage(image);
 
-        // Attendre la fin du chargement
+        image.errorProperty().addListener(
+                (observable, oldValue, hasError) -> {
+
+                    if (hasError && fallbackOnError
+                            && newsImage.getImage() == image) {
+                        showPlaceholder();
+                    }
+                }
+        );
+
         image.progressProperty().addListener(
                 (observable, oldValue, newValue) -> {
 
                     if (newValue.doubleValue() >= 1.0
                             && !image.isError()) {
-
                         applyImageCrop(image);
                     }
                 }
         );
 
-        // Cas où l'image est déjà chargée
-        if (image.getProgress() >= 1.0 && !image.isError()) {
+        if (image.isError() && fallbackOnError) {
+            showPlaceholder();
+        } else if (image.getProgress() >= 1.0
+                && !image.isError()) {
             applyImageCrop(image);
         }
     }
 
     private void applyImageCrop(Image image) {
 
-        // Éviter de recadrer une ancienne image
         if (newsImage.getImage() != image) {
             return;
         }
@@ -115,18 +196,15 @@ public class NewsCardController {
 
         if (imageRatio > targetRatio) {
 
-            // Image trop large : recadrer les côtés
             cropHeight = imageHeight;
             cropWidth = imageHeight * targetRatio;
 
         } else {
 
-            // Image trop haute : recadrer le haut et le bas
             cropWidth = imageWidth;
             cropHeight = imageWidth / targetRatio;
         }
 
-        // Centrer le recadrage
         double cropX = (imageWidth - cropWidth) / 2;
         double cropY = (imageHeight - cropHeight) / 2;
 
@@ -138,5 +216,34 @@ public class NewsCardController {
         );
 
         newsImage.setViewport(viewport);
+    }
+
+    @FXML
+    private void openNews() {
+
+        if (item == null || hostServices == null) {
+            System.err.println(
+                    "Actualité ou HostServices manquants."
+            );
+            return;
+        }
+
+        try {
+            URI uri = URI.create(item.getUrl());
+
+            if (!"https".equalsIgnoreCase(uri.getScheme())
+                    || uri.getHost() == null) {
+
+                System.err.println("URL non autorisée : " + uri);
+                return;
+            }
+
+            hostServices.showDocument(uri.toString());
+
+        } catch (IllegalArgumentException e) {
+            System.err.println(
+                    "URL d'actualité invalide : " + e.getMessage()
+            );
+        }
     }
 }

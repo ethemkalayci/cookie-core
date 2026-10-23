@@ -1,5 +1,6 @@
 package be.cookies.studio.core.controller;
 
+import javafx.application.HostServices;
 import javafx.animation.*;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -44,6 +45,14 @@ public class ShellController {
     private BorderPane contentContainer;
 
     private Button activeButton;
+    private HostServices hostServices;
+
+    public void setHostServices(HostServices hostServices) {
+        this.hostServices = hostServices;
+
+        // Actualiser l'accueil après réception des HostServices
+        loadView("home-view.fxml");
+    }
 
     @FXML
     private void initialize() {
@@ -58,7 +67,6 @@ public class ShellController {
 
         accueilButton.setOnAction(event -> {
             selectButton(accueilButton);
-            loadView("home-view.fxml");
         });
         instancesButton.setOnAction(event -> {
             selectButton(instancesButton);
@@ -93,6 +101,12 @@ public class ShellController {
         FXMLLoader file = new FXMLLoader(ressource);
         try{
             Parent page = file.load();
+
+            if (fileName.equals("home-view.fxml")) {
+                HomeController homeController = file.getController();
+                homeController.setHostServices(hostServices);
+            }
+
             contentContainer.setCenter(page);
         }catch (IOException e){
             e.printStackTrace();
