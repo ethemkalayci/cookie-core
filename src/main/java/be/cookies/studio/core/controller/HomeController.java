@@ -18,6 +18,9 @@ import be.cookies.studio.core.service.NewsLoadResult;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class HomeController {
     @FXML
@@ -126,7 +129,13 @@ public class HomeController {
             return;
         }
 
-        for (NewsItem item : news) {
+        // Les publications sont ajoutées en fin de JSON : inverser aussi les
+        // ex aequo, puis trier par date (tri stable).
+        List<NewsItem> orderedNews = new ArrayList<>(news);
+        Collections.reverse(orderedNews);
+        orderedNews.sort(Comparator.comparing(NewsItem::getPublicationDate).reversed());
+
+        for (NewsItem item : orderedNews) {
 
             FXMLLoader loader = new FXMLLoader(ressource);
 

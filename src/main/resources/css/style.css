@@ -320,3 +320,219 @@
 .news-card-view-button:focused {
     -fx-border-color: #B99AE9;
 }
+
+/* ==================================================
+   INSTANCE VIEW — COOKIE CORE
+   ================================================== */
+
+/* Fond principal de la page */
+.instance-scroll {
+    -fx-background-color: #13171F;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.instance-scroll > .viewport {
+    -fx-background-color: #13171F;
+}
+
+/* =========================================
+   INSTANCES OFFICIELLES — BANNIÈRE
+   ========================================= */
+
+.instance-banner {
+    -fx-background-color: #13171F;
+    -fx-background-size: cover;
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+}
+
+/* Nom de l'instance */
+.instance-title {
+    -fx-font-size: 54px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #FFFFFF;
+
+    -fx-effect: dropshadow(
+            gaussian,
+            rgba(0, 0, 0, 0.6),
+            16, 0.2, 0, 3
+    );
+}
+
+/* Version Minecraft et modloader */
+.instance-version {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #CDBCE8;
+}
+
+/* =========================================
+   CARROUSEL — FLÈCHES
+   ========================================= */
+
+.instance-arrow {
+    -fx-background-color: rgba(15, 15, 25, 0.65);
+    -fx-background-radius: 50%;
+
+    -fx-border-color: rgba(255, 255, 255, 0.20);
+    -fx-border-radius: 50%;
+    -fx-border-width: 1px;
+
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+
+    -fx-min-width: 48px;
+    -fx-min-height: 48px;
+    -fx-pref-width: 48px;
+    -fx-pref-height: 48px;
+
+    -fx-padding: 0;
+    -fx-alignment: CENTER;
+    -fx-cursor: hand;
+}
+
+.instance-arrow:hover {
+    -fx-background-color: #7040B6;
+    -fx-border-color: #A77BE8;
+}
+
+.instance-arrow:pressed {
+    -fx-background-color: #593095;
+    -fx-scale-x: 0.94;
+    -fx-scale-y: 0.94;
+}
+
+.instance-arrow:disabled {
+    -fx-opacity: 0.35;
+}
+
+/* =========================================
+   BOUTON PRINCIPAL — INSTALLER / JOUER
+   ========================================= */
+
+.instance-play-button {
+    -fx-background-color: #7040B6;
+    -fx-background-radius: 10px;
+
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+
+    -fx-padding: 15px 48px;
+    -fx-cursor: hand;
+
+    -fx-effect: dropshadow(
+            gaussian,
+            rgba(30, 10, 55, 0.6),
+            18, 0.25, 0, 6
+    );
+}
+
+.instance-play-button:hover {
+    -fx-background-color: #8655D0;
+}
+
+.instance-play-button:pressed {
+    -fx-background-color: #593093;
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+}
+
+.instance-play-button:disabled {
+    -fx-opacity: 0.5;
+}
+
+/* =========================================
+   ACTIONS — MODS / RESOURCE PACKS / SHADERS
+   ========================================= */
+
+.instance-actions {
+    -fx-background-color: #13171F;
+}
+
+.instance-action-button {
+    -fx-background-color: #1B1724;
+    -fx-background-radius: 10px;
+
+    -fx-border-color: #393047;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+
+    -fx-text-fill: #F5F2FA;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+
+    -fx-padding: 13px 25px;
+    -fx-cursor: hand;
+}
+
+.instance-action-button:hover {
+    -fx-background-color: #342447;
+    -fx-border-color: #7040B6;
+}
+
+.instance-action-button:pressed {
+    -fx-background-color: #7040B6;
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+}
+
+.instance-action-button:focused {
+    -fx-border-color: #B99AE9;
+}
+
+.instance-action-button:disabled {
+    -fx-opacity: 0.45;
+}
+
+/* =========================================
+   MES INSTANCES — SECTION PERSONNELLE
+   ========================================= */
+
+.personal-instances-section {
+    -fx-background-color: #13171F;
+}
+
+.personal-instances-title {
+    -fx-text-fill: #F5F2FA;
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+}
+
+/* =========================================
+   MES INSTANCES — BOUTON AJOUTER
+   ========================================= */
+
+.add-instance-button {
+    -fx-background-color: #7040B6;
+    -fx-background-radius: 10px;
+
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+
+    -fx-padding: 12px 24px;
+    -fx-cursor: hand;
+}
+
+.add-instance-button:hover {
+    -fx-background-color: #8655D0;
+}
+
+.add-instance-button:pressed {
+    -fx-background-color: #593093;
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+}
+
+.add-instance-button:focused {
+    -fx-border-color: #B99AE9;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+}
+
+.add-instance-button:disabled {
+    -fx-opacity: 0.5;
+}

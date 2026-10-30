@@ -73,9 +73,7 @@ public class NewsService {
         }
     }
 
-    private String downloadNews()
-            throws IOException, InterruptedException {
-
+    private String downloadNews() throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(NEWS_URL))
                 .timeout(Duration.ofSeconds(10))
@@ -120,7 +118,8 @@ public class NewsService {
                         LocalDate.parse(
                                 object.get("publicationDate").getAsString()
                         ),
-                        object.get("url").getAsString()
+                        object.get("url").getAsString(),
+                        object.get("id").getAsInt()
                 );
 
                 news.add(item);

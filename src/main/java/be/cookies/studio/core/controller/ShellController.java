@@ -67,6 +67,7 @@ public class ShellController {
 
         accueilButton.setOnAction(event -> {
             selectButton(accueilButton);
+            loadView("home-view.fxml");
         });
         instancesButton.setOnAction(event -> {
             selectButton(instancesButton);

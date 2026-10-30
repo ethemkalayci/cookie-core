@@ -9,14 +9,16 @@ public class NewsItem {
     private final String description;
     private final LocalDate publicationDate;
     private final String url;
+    private final int id;
 
-    public NewsItem(String imageUrl, String categorie, String titre, String description, LocalDate publicationDate, String url){
+    public NewsItem(String imageUrl, String categorie, String titre, String description, LocalDate publicationDate, String url, int id){
         this.imageUrl = imageUrl;
         this.categorie = categorie;
         this.titre = titre;
         this.description = description;
         this.publicationDate = publicationDate;
         this.url = url;
+        this.id = id;
     }
 
     public String getCategorie() {
@@ -41,5 +43,9 @@ public class NewsItem {
 
     public String getUrl() {
         return url;
+    }
+
+    public int getId() {
+        return id;
     }
 }
