@@ -17,6 +17,7 @@ import java.net.URL;
 import java.util.Objects;
 
 public class CookieCoreApp extends Application {
+    @Override public void init() { be.cookies.studio.core.service.SettingsService.get(); }
 
     @Override
     public void start(Stage stage) {
@@ -50,9 +51,11 @@ public class CookieCoreApp extends Application {
 
         // Conteneur de la vidéo
         StackPane root = new StackPane(mediaView);
-        root.setStyle("-fx-background-color: #13171F;");
+        
 
         Scene introScene = new Scene(root, 900, 600);
+        be.cookies.studio.core.service.ThemeService.restore();
+        be.cookies.studio.core.service.ThemeService.attach(introScene);
 
         // Adaptation de la vidéo aux dimensions de la fenêtre
         mediaView.setPreserveRatio(true);
@@ -103,7 +106,11 @@ public class CookieCoreApp extends Application {
             Parent root = loader.load();
             ShellController shellController = loader.getController();
             shellController.setHostServices(getHostServices());
-            Scene scene = new Scene(root,1200,900);
+            Scene scene = new Scene(root,1280,720);
+            be.cookies.studio.core.service.ThemeService.restore();
+            be.cookies.studio.core.service.ThemeService.attach(scene);
+            stage.setTitle("Cookie Core — Cookies Studio");
+            stage.setMinWidth(760); stage.setMinHeight(480);
             stage.setMaximized(true);
             stage.setScene(scene);
             stage.show();

@@ -25,8 +25,8 @@ public class ModpackDownloadService {
             .build();
 
     public Path downloadModpack(OfficialInstance instance)
-            throws IOException, InterruptedException {
-
+            throws IOException, InterruptedException {return downloadModpack(instance,InstanceFiles.QUIET);}
+    public Path downloadModpack(OfficialInstance instance,InstanceFiles.Progress progress) throws IOException,InterruptedException {
         if (instance == null) {
             throw new IllegalArgumentException(
                     "L'instance officielle ne peut pas être null."
@@ -56,20 +56,21 @@ public class ModpackDownloadService {
                     .GET()
                     .build();
 
-            HttpResponse<Path> response = httpClient.send(
-                    request,
-                    HttpResponse.BodyHandlers.ofFile(tempFile)
-            );
-
-            if (response.statusCode() != 200) {
-                throw new IOException(
-                        "Échec du téléchargement du modpack. HTTP : "
-                                + response.statusCode()
-                );
-            }
-
-            // Calcul de l'empreinte du fichier téléchargé
-            String actualSha256 = calculateSha256(tempFile);
+            HttpResponse<InputStream> response=httpClient.send(request,HttpResponse.BodyHandlers.ofInputStream());
+            String actualSha256;
+            try(var input=response.body()){
+                if(response.statusCode()!=200)throw new IOException("Échec du téléchargement du modpack. HTTP : "+response.statusCode());
+                long expected=response.headers().firstValueAsLong("Content-Length").orElse(-1);
+                if(expected>4L*1024*1024*1024)throw new IOException("Archive supérieure à 4 Gio");
+                var digest=MessageDigest.getInstance("SHA-256");long received=0;byte[] buffer=new byte[65536];int count;
+                var timer=java.util.concurrent.Executors.newSingleThreadScheduledExecutor(r->{Thread thread=new Thread(r,"download-timeout");thread.setDaemon(true);return thread;});
+                var timeout=timer.schedule(()->{try{input.close();}catch(IOException ignored){}},10,java.util.concurrent.TimeUnit.MINUTES);
+                try(var output=Files.newOutputStream(tempFile)){
+                    while((count=input.read(buffer))!=-1){received+=count;if(received>4L*1024*1024*1024)throw new IOException("Archive supérieure à 4 Gio");progress.report("Téléchargement de "+instance.getName(),received,expected);output.write(buffer,0,count);digest.update(buffer,0,count);}
+                }finally{timeout.cancel(false);timer.shutdownNow();}
+                if(expected>=0&&received!=expected)throw new IOException("Téléchargement incomplet");
+                actualSha256=HexFormat.of().formatHex(digest.digest());progress.report("Vérification SHA-256",received,received);
+            }catch(NoSuchAlgorithmException impossible){throw new IllegalStateException(impossible);}
 
             // Comparaison avec l'empreinte du catalogue
             if (!actualSha256.equalsIgnoreCase(instance.getSha256())) {
@@ -97,29 +98,4 @@ public class ModpackDownloadService {
         }
     }
 
-    private String calculateSha256(Path file) throws IOException {
-
-        MessageDigest digest;
-
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(
-                    "SHA-256 n'est pas disponible.", e
-            );
-        }
-
-        try (InputStream inputStream = new DigestInputStream(
-                Files.newInputStream(file),
-                digest
-        )) {
-            byte[] buffer = new byte[8192];
-
-            while (inputStream.read(buffer) != -1) {
-                // La lecture alimente automatiquement le digest.
-            }
-        }
-
-        return HexFormat.of().formatHex(digest.digest());
-    }
 }

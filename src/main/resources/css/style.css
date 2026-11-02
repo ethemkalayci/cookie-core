@@ -1,538 +1,178 @@
-/* ==================================================
-   COOKIE CORE — DESIGN SYSTEM
-   Cookies Studio
-   ================================================== */
+/* Amethyste safety palette for popup measurement before ThemeService attaches.
+   Inline active palette takes precedence. Keep in sync with Theme.AMETHYSTE (tested). */
 .root {
-    /* Fond principal de l'application */
-    -color-background: #13171F;
-
-    /* Fond du menu latéral (Sidebar) */
-    -color-sidebar: #1B1724;
-
-    /* Couleur principale des textes */
-    -color-text-primary: #F5F2FA;
-
-    /* Couleur de survol des boutons */
-    -color-hover: #342447;
-
-    /* Couleur d'accent : violet Cookie Core */
-    -color-accent: #7040B6;
-
-    /* Application du fond principal */
-    -fx-background-color: -color-background;
+    -cc-background: #0E0B1D;
+    -cc-sidebar: #2A1E4D;
+    -cc-panel: #3A3A52;
+    -cc-card: #2A1E4D;
+    -cc-content: #0E0B1D;
+    -cc-nav-active: #5A3B8C;
+    -cc-nav-inactive: #2A1E4D;
+    -cc-nav-hover: #3A3A52;
+    -cc-selection: #8B7CC7;
+    -cc-button: #5A3B8C;
+    -cc-button-text: #F5F2FA;
+    -cc-button-hover: #8B7CC7;
+    -cc-button-disabled: #3A3A52;
+    -cc-play: #5A3B8C;
+    -cc-text: #F5F2FA;
+    -cc-text-secondary: #8B7CC7;
+    -cc-text-muted: #F5F2FA;
+    -cc-border: #3A3A52;
+    -cc-separator: #C9C2E3;
+    -cc-icon: #F5F2FA;
+    -cc-accent: #5A3B8C;
+    -cc-accent-secondary: #8B7CC7;
+    -cc-accent-tertiary: #C9C2E3;
+    -cc-progress: #5A3B8C;
+    -cc-success: #7AD69C;
+    -cc-error: #FF7185;
+    -cc-warning: #F4CE58;
+    -cc-banner-text: #F5F2FA;
+    -cc-overlay: #0E0B1D;
 }
 
-.sidebar {
-    -fx-background-color: -color-sidebar;
-    -fx-background-radius: 1em;
-    -fx-padding: 1.5em;
+/* COOKIE CORE — shared desktop design system.
+   Spacing: 4 / 8 / 12 / 16 / 24 / 32. Controls: 40, primary: 48.
+   Radii: controls 8, surfaces 16. All color roles belong to ThemeColor. */
+.root {
+ -fx-font-family: "Segoe UI"; -fx-font-size: 14px;
+ -fx-background-color: -cc-background; -fx-base: -cc-panel;
+ -fx-control-inner-background: -cc-content; -fx-accent: -cc-selection;
+ -fx-focus-color: -cc-selection; -fx-faint-focus-color: transparent;
 }
-
-.sidebar .label {
-    -fx-text-fill: -color-text-primary;
-    -fx-font-size: 1.4em;
-    -fx-font-weight: bold;
-}
-
-.sidebar-separator .line {
-    -fx-border-color: #7040B6;
-    -fx-border-width: 1;
-}
-
-.sidebar .button {
-    -fx-graphic-text-gap: 10px;
-    -fx-background-color: transparent;
-    -fx-text-fill: -color-text-primary;
-
-    -fx-alignment: CENTER_LEFT;
-    -fx-font-size: 1.1em;
-
-    -fx-pref-height: 3.1em;
-    -fx-padding: 0 1em 0 1em;
-
-    -fx-background-radius: 0.7em;
-    -fx-cursor: hand;
-}
-
-.sidebar .button:hover {
-    -fx-background-color: -color-hover;
-}
-
-.sidebar .button.active {
-    -fx-background-color: -color-accent;
-
-    -fx-pref-height: 3.4em;
-    -fx-font-weight: bold;
-}
-
-.home-banner{
-    -fx-background-image: url(../images/banners/mc.jpg);
-    -fx-background-size: cover;
-    -fx-background-position: center;
-}
-
-
-.banner-gradient {
-    -fx-background-color: linear-gradient(
-            from 0% 100% to 100% 0%,
-            rgba(11, 13, 22, 0.92) 0%,
-            rgba(11, 13, 22, 0.55) 35%,
-            rgba(11, 13, 22, 0.18) 70%,
-            rgba(11, 13, 22, 0.00) 100%
-    );
-}
-
-
-/* Fond principal de HomeView */
-.home-scroll {
-    -fx-background-color: #13171F;
-    -fx-background-insets: 0;
-}
-
-/* Fond intérieur du ScrollPane */
-.home-scroll > .viewport {
-    -fx-background-color: #13171F;
-}
-
-
-/* =========================================
-   HOME VIEW — BANNIÈRE
-   ========================================= */
-
-.home-banner {
-    -fx-background-image: url("../images/banners/mc.jpg");
-    -fx-background-size: cover;
-    -fx-background-position: center;
-    -fx-background-repeat: no-repeat;
-}
-
-.banner-gradient {
-    -fx-background-color: linear-gradient(
-            from 0% 100% to 100% 0%,
-            rgba(11, 13, 22, 0.94) 0%,
-            rgba(11, 13, 22, 0.72) 35%,
-            rgba(11, 13, 22, 0.20) 75%,
-            rgba(11, 13, 22, 0.00) 100%
-    );
-}
-
-/* =========================================
-   HOME VIEW — TEXTES
-   ========================================= */
-
-.home-welcome {
-    -fx-font-size: 27px;
-    -fx-font-weight: normal;
-    -fx-text-fill: #FFFFFF;
-    -fx-effect: dropshadow(
-            gaussian, rgba(0, 0, 0, 0.55),
-            10, 0.2, 0, 2
-    );
-}
-
-.home-instance-subtitle {
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #CDBCE8;
-}
-
-.home-instance-title {
-    -fx-font-size: 54px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #FFFFFF;
-    -fx-effect: dropshadow(
-            gaussian, rgba(0, 0, 0, 0.6),
-            16, 0.2, 0, 3
-    );
-}
-
-/* =========================================
-   HOME VIEW — BOUTON JOUER
-   ========================================= */
-
-.home-play-button {
-    -fx-background-color: #7040B6;
-    -fx-background-radius: 10px;
-
-    -fx-text-fill: white;
-    -fx-font-size: 15px;
-    -fx-font-weight: bold;
-
-    -fx-padding: 14px 38px;
-    -fx-cursor: hand;
-
-    -fx-effect: dropshadow(
-            gaussian, rgba(30, 10, 55, 0.6),
-            18, 0.25, 0, 6
-    );
-}
-
-.home-play-button:hover {
-    -fx-background-color: #8655D0;
-}
-
-.home-play-button:pressed {
-    -fx-background-color: #593093;
-}
-
-/* =========================================
-   HOME VIEW — NOTIFICATIONS
-   ========================================= */
-
-.home-notification-button {
-    -fx-background-color: rgba(15, 15, 25, 0.70);
-    -fx-background-radius: 50%;
-
-    -fx-border-color: rgba(255, 255, 255, 0.20);
-    -fx-border-radius: 50%;
-
-    -fx-text-fill: white;
-    -fx-font-size: 19px;
-
-    -fx-min-width: 48px;
-    -fx-min-height: 48px;
-    -fx-pref-width: 48px;
-    -fx-pref-height: 48px;
-
-    -fx-cursor: hand;
-}
-
-.home-notification-button:hover {
-    -fx-background-color: rgba(112, 64, 182, 0.85);
-}
-
-/* =========================================
-   HOME VIEW — ACTUALITÉS
-   ========================================= */
-
-.home-news {
-    -fx-background-color: #13171F;
-}
-
-.home-news-title {
-    -fx-text-fill: white;
-    -fx-font-size: 24px;
-    -fx-font-weight: bold;
-}
-
-.home-news-description {
-    -fx-text-fill: #AFAABB;
-    -fx-font-size: 14px;
-}
-
-
-/* Transition douce entre la bannière et les actualités */
-
-.banner-bottom-fade {
-    -fx-background-color: linear-gradient(
-            from 0% 0% to 0% 100%,
-            rgba(19, 23, 31, 0.00) 0%,
-            rgba(19, 23, 31, 0.18) 25%,
-            rgba(19, 23, 31, 0.45) 55%,
-            rgba(19, 23, 31, 0.78) 80%,
-            #13171F 100%
-    );
-}
-
-
-/* Conteneur principal */
-.news-card {
-    -fx-background-color: #171C26;
-    -fx-background-radius: 14px;
-    -fx-border-color: #303544;
-    -fx-border-width: 1px;
-    -fx-border-radius: 14px;
-    -fx-padding: 0;
-}
-
-/* Contenu sous l'image */
-.news-card-content {
-    -fx-padding: 16px;
-}
-
-/* Catégorie */
-.news-card-category {
-    -fx-text-fill: #B895FF;
-    -fx-font-size: 11px;
-    -fx-font-weight: bold;
-}
-
-/* Titre */
-.news-card-title {
-    -fx-text-fill: #FFFFFF;
-    -fx-font-size: 20px;
-    -fx-font-weight: bold;
-}
-
-/* Description */
-.news-card-description {
-    -fx-text-fill: #A9AFBE;
-    -fx-font-size: 13px;
-}
-
-/* Date */
-.news-card-date {
-    -fx-text-fill: #8E94A5;
-    -fx-font-size: 11px;
-}
-
-/* Séparateur */
-.news-card-separator .line {
-    -fx-border-color: #303544;
-}
-
-
-/* ===================================
-   NEWS CARD — BOUTON VOIR
-   =================================== */
-
-.news-card-view-button {
-    -fx-background-color: #7040B6;
-    -fx-text-fill: #F5F2FA;
-
-    -fx-font-size: 0.85em;
-    -fx-font-weight: bold;
-
-    -fx-padding: 0.65em 1.3em;
-    -fx-background-radius: 0.65em;
-
-    -fx-border-color: transparent;
-    -fx-border-radius: 0.65em;
-    -fx-border-width: 0.08em;
-
-    -fx-cursor: hand;
-}
-
-/* Survol */
-.news-card-view-button:hover {
-    -fx-background-color: #8858D0;
-    -fx-text-fill: white;
-}
-
-/* Clic */
-.news-card-view-button:pressed {
-    -fx-background-color: #593095;
-    -fx-scale-x: 0.96;
-    -fx-scale-y: 0.96;
-}
-
-/* Navigation au clavier */
-.news-card-view-button:focused {
-    -fx-border-color: #B99AE9;
-}
-
-/* ==================================================
-   INSTANCE VIEW — COOKIE CORE
-   ================================================== */
-
-/* Fond principal de la page */
-.instance-scroll {
-    -fx-background-color: #13171F;
-    -fx-background-insets: 0;
-    -fx-padding: 0;
-}
-
-.instance-scroll > .viewport {
-    -fx-background-color: #13171F;
-}
-
-/* =========================================
-   INSTANCES OFFICIELLES — BANNIÈRE
-   ========================================= */
-
-.instance-banner {
-    -fx-background-color: #13171F;
-    -fx-background-size: cover;
-    -fx-background-position: center;
-    -fx-background-repeat: no-repeat;
-}
-
-/* Nom de l'instance */
-.instance-title {
-    -fx-font-size: 54px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #FFFFFF;
-
-    -fx-effect: dropshadow(
-            gaussian,
-            rgba(0, 0, 0, 0.6),
-            16, 0.2, 0, 3
-    );
-}
-
-/* Version Minecraft et modloader */
-.instance-version {
-    -fx-font-size: 15px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #CDBCE8;
-}
-
-/* =========================================
-   CARROUSEL — FLÈCHES
-   ========================================= */
-
-.instance-arrow {
-    -fx-background-color: rgba(15, 15, 25, 0.65);
-    -fx-background-radius: 50%;
-
-    -fx-border-color: rgba(255, 255, 255, 0.20);
-    -fx-border-radius: 50%;
-    -fx-border-width: 1px;
-
-    -fx-text-fill: #FFFFFF;
-    -fx-font-size: 20px;
-    -fx-font-weight: bold;
-
-    -fx-min-width: 48px;
-    -fx-min-height: 48px;
-    -fx-pref-width: 48px;
-    -fx-pref-height: 48px;
-
-    -fx-padding: 0;
-    -fx-alignment: CENTER;
-    -fx-cursor: hand;
-}
-
-.instance-arrow:hover {
-    -fx-background-color: #7040B6;
-    -fx-border-color: #A77BE8;
-}
-
-.instance-arrow:pressed {
-    -fx-background-color: #593095;
-    -fx-scale-x: 0.94;
-    -fx-scale-y: 0.94;
-}
-
-.instance-arrow:disabled {
-    -fx-opacity: 0.35;
-}
-
-/* =========================================
-   BOUTON PRINCIPAL — INSTALLER / JOUER
-   ========================================= */
-
-.instance-play-button {
-    -fx-background-color: #7040B6;
-    -fx-background-radius: 10px;
-
-    -fx-text-fill: #FFFFFF;
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-
-    -fx-padding: 15px 48px;
-    -fx-cursor: hand;
-
-    -fx-effect: dropshadow(
-            gaussian,
-            rgba(30, 10, 55, 0.6),
-            18, 0.25, 0, 6
-    );
-}
-
-.instance-play-button:hover {
-    -fx-background-color: #8655D0;
-}
-
-.instance-play-button:pressed {
-    -fx-background-color: #593093;
-    -fx-scale-x: 0.97;
-    -fx-scale-y: 0.97;
-}
-
-.instance-play-button:disabled {
-    -fx-opacity: 0.5;
-}
-
-/* =========================================
-   ACTIONS — MODS / RESOURCE PACKS / SHADERS
-   ========================================= */
-
-.instance-actions {
-    -fx-background-color: #13171F;
-}
-
-.instance-action-button {
-    -fx-background-color: #1B1724;
-    -fx-background-radius: 10px;
-
-    -fx-border-color: #393047;
-    -fx-border-radius: 10px;
-    -fx-border-width: 1px;
-
-    -fx-text-fill: #F5F2FA;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-
-    -fx-padding: 13px 25px;
-    -fx-cursor: hand;
-}
-
-.instance-action-button:hover {
-    -fx-background-color: #342447;
-    -fx-border-color: #7040B6;
-}
-
-.instance-action-button:pressed {
-    -fx-background-color: #7040B6;
-    -fx-scale-x: 0.97;
-    -fx-scale-y: 0.97;
-}
-
-.instance-action-button:focused {
-    -fx-border-color: #B99AE9;
-}
-
-.instance-action-button:disabled {
-    -fx-opacity: 0.45;
-}
-
-/* =========================================
-   MES INSTANCES — SECTION PERSONNELLE
-   ========================================= */
-
-.personal-instances-section {
-    -fx-background-color: #13171F;
-}
-
-.personal-instances-title {
-    -fx-text-fill: #F5F2FA;
-    -fx-font-size: 26px;
-    -fx-font-weight: bold;
-}
-
-/* =========================================
-   MES INSTANCES — BOUTON AJOUTER
-   ========================================= */
-
-.add-instance-button {
-    -fx-background-color: #7040B6;
-    -fx-background-radius: 10px;
-
-    -fx-text-fill: #FFFFFF;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-
-    -fx-padding: 12px 24px;
-    -fx-cursor: hand;
-}
-
-.add-instance-button:hover {
-    -fx-background-color: #8655D0;
-}
-
-.add-instance-button:pressed {
-    -fx-background-color: #593093;
-    -fx-scale-x: 0.97;
-    -fx-scale-y: 0.97;
-}
-
-.add-instance-button:focused {
-    -fx-border-color: #B99AE9;
-    -fx-border-radius: 10px;
-    -fx-border-width: 1px;
-}
-
-.add-instance-button:disabled {
-    -fx-opacity: 0.5;
-}
+.label, .check-box, .radio-button { -fx-text-fill: -cc-text; }
+.page-host, .app-shell, .page { -fx-background-color: -cc-background; }
+.page { -fx-padding: 32; }
+.page-title, .account-title { -fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: -cc-text; }
+.eyebrow { -fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: -cc-accent-secondary; }
+.page-description, .account-description, .home-news-description { -fx-font-size: 14px; -fx-text-fill: -cc-text; -fx-opacity: 0.85; -fx-line-spacing: 3; }
+.section-title, .personal-instances-title, .home-news-title, .account-section-title { -fx-font-size: 21px; -fx-font-weight: bold; }
+.card-title, .settings-heading { -fx-font-size: 17px; -fx-font-weight: bold; }
+.muted, .home-instance-meta, .news-card-date { -fx-text-fill: -cc-text-muted; -fx-font-size: 12px; }
+.status-message { -fx-padding: 12 16; -fx-background-color: -cc-panel; -fx-background-radius: 8; }
+.surface-card, .news-card { -fx-background-color: -cc-card; -fx-border-color: -cc-border; -fx-border-width: 1; -fx-background-radius: 16; -fx-border-radius: 16; }
+.surface-card { -fx-padding: 24; }
+.separator .line { -fx-border-color: -cc-separator; -fx-border-width: 1 0 0 0; -fx-opacity: 0.35; }
+/* Navigation: selection never changes geometry. */
+.sidebar { -fx-background-color: -cc-sidebar; -fx-padding: 24 16 20 16; }
+.brand { -fx-padding: 0 0 24 0; }
+.brand-title { -fx-font-size: 15px; -fx-font-weight: bold; }
+.brand-caption { -fx-font-size: 10px; -fx-text-fill: -cc-text-muted; -fx-opacity: 0.75; }
+.nav-caption { -fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: -cc-text-muted; -fx-padding: 16 12 8 12; -fx-opacity: 0.7; }
+.sidebar .nav-button { -fx-background-color: -cc-nav-inactive; -fx-text-fill: -cc-text; -fx-alignment: CENTER_LEFT; -fx-font-weight: normal; -fx-graphic-text-gap: 12; -fx-padding: 10 12; -fx-pref-height: 44; -fx-min-height: 44; -fx-font-size: 13px; }
+.sidebar .nav-button:hover { -fx-background-color: -cc-nav-hover; }
+.sidebar .nav-button.active { -fx-background-color: -cc-nav-active; -fx-text-fill: -cc-button-text; -fx-font-weight: bold; }
+.theme-icon SVGPath, .theme-icon Path { -fx-fill: -cc-icon; }
+.sidebar .nav-button.active .theme-icon SVGPath, .sidebar .nav-button.active .theme-icon Path { -fx-fill: -cc-button-text; }
+/* Inputs and actions: shared dimensions, stable focus borders. */
+.button { -fx-background-color: -cc-button; -fx-text-fill: -cc-button-text; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: transparent; -fx-border-width: 2; -fx-padding: 9 16; -fx-min-height: 40; -fx-cursor: hand; -fx-font-weight: bold; }
+.button:hover { -fx-background-color: -cc-button-hover; }
+.button:pressed { -fx-background-color: derive(-cc-button, -12%); }
+.button:focused { -fx-border-color: -cc-selection; }
+.button:disabled { -fx-background-color: -cc-button-disabled; -fx-opacity: 0.55; -fx-cursor: default; }
+.secondary-button, .account-secondary { -fx-background-color: -cc-panel; -fx-text-fill: -cc-text; -fx-font-weight: normal; }
+.secondary-button:hover, .account-secondary:hover { -fx-background-color: derive(-cc-panel, 15%); }
+.secondary-button:pressed, .account-secondary:pressed { -fx-background-color: derive(-cc-panel, -10%); }
+.home-play-button, .instance-play-button { -fx-background-color: -cc-play; -fx-text-fill: -cc-button-text; -fx-min-height: 48; -fx-padding: 12 24; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 18, 0.25, 0, 6); }
+.home-play-button:hover, .instance-play-button:hover { -fx-background-color: derive(-cc-play, 12%); }
+.home-play-button:pressed, .instance-play-button:pressed { -fx-background-color: derive(-cc-play, -12%); }
+.home-play-button:disabled, .instance-play-button:disabled { -fx-background-color: -cc-button-disabled; }
+.text-field, .text-area .content { -fx-background-color: -cc-content; -fx-text-fill: -cc-text; -fx-prompt-text-fill: -cc-text-muted; -fx-highlight-fill: -cc-selection; -fx-highlight-text-fill: -cc-text; }
+.text-field, .combo-box, .color-picker { -fx-background-color: -cc-content; -fx-border-color: -cc-border; -fx-border-radius: 8; -fx-background-radius: 8; -fx-border-width: 2; -fx-min-height: 40; -fx-padding: 6 10; }
+.text-field:focused, .combo-box:focused, .color-picker:focused { -fx-border-color: -cc-selection; }
+.combo-box .list-cell, .color-picker .label { -fx-text-fill: -cc-text; }
+.list-view, .list-cell { -fx-background-color: -cc-content; -fx-text-fill: -cc-text; }
+.list-cell:filled:hover { -fx-background-color: -cc-nav-hover; }
+.list-cell:filled:selected { -fx-background-color: -cc-selection; -fx-text-fill: ladder(-cc-selection, white 49%, black 50%); }
+.combo-box > .list-cell:filled:selected { -fx-background-color: transparent; -fx-text-fill: -cc-text; }
+.check-box .box { -fx-background-color: -cc-content; -fx-border-color: -cc-border; -fx-border-radius: 4; -fx-background-radius: 4; }
+.check-box:selected .mark { -fx-background-color: -cc-accent-secondary; }
+.slider .track { -fx-background-color: -cc-panel; }
+.slider .thumb { -fx-background-color: -cc-accent-secondary; }
+.slider .axis { -fx-tick-label-fill: -cc-text-muted; }
+.progress-bar .track { -fx-background-color: -cc-panel; }
+.progress-bar .bar { -fx-background-color: -cc-progress; }
+.progress-indicator { -fx-progress-color: -cc-progress; }
+.tooltip { -fx-background-color: -cc-panel; -fx-text-fill: -cc-text; -fx-padding: 10 14; -fx-background-radius: 8; }
+/* Native scrolling: no competing backgrounds or horizontal page bars. */
+.scroll-pane { -fx-background-color: -cc-background; -fx-background-insets: 0; -fx-padding: 0; }
+.scroll-pane > .viewport { -fx-background-color: -cc-background; }
+.scroll-pane > .corner { -fx-background-color: -cc-background; }
+.sidebar-scroll, .sidebar-scroll > .viewport { -fx-background-color: -cc-sidebar; }
+.scroll-bar { -fx-background-color: transparent; -fx-pref-width: 10; -fx-pref-height: 10; }
+.scroll-bar .track { -fx-background-color: transparent; }
+.scroll-bar .thumb { -fx-background-color: -cc-border; -fx-background-radius: 8; -fx-background-insets: 2; }
+.scroll-bar .thumb:hover { -fx-background-color: -cc-accent-secondary; }
+.scroll-bar .increment-button, .scroll-bar .decrement-button { -fx-padding: 0; }
+.scroll-bar .increment-arrow, .scroll-bar .decrement-arrow { -fx-padding: 0; -fx-shape: ""; }
+/* Floating hero content: image remains visible beneath the themed fades.
+   Shadows soften the text and actions without blurring interactive content. */
+.home-banner { -fx-background-image: url("../images/banners/mc.jpg"); -fx-background-size: cover; -fx-background-position: center; -fx-background-repeat: no-repeat; }
+.instance-banner { -fx-background-color: -cc-card; }
+.banner-gradient { -fx-background-color: linear-gradient(from 0% 80% to 100% 10%, -cc-overlay 0%, -cc-overlay 18%, transparent 100%); }
+.banner-bottom-fade { -fx-background-color: linear-gradient(to bottom, transparent, -cc-background); }
+.hero-copy { -fx-padding: 24; -fx-background-color: transparent; }
+.home-instance-title, .instance-title { -fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: -cc-banner-text; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 16, 0.2, 0, 3); }
+.hero-copy .label { -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.55), 8, 0.2, 0, 2); }
+.home-instance-details, .instance-version { -fx-font-size: 14px; -fx-text-fill: -cc-text-secondary; }
+.hero-toolbar { -fx-padding: 16 24; -fx-background-color: transparent; }
+.instance-arrow, .home-notification-button { -fx-min-width: 44; -fx-pref-width: 44; -fx-max-width: 44; -fx-min-height: 44; -fx-pref-height: 44; -fx-max-height: 44; -fx-padding: 0; -fx-background-color: -cc-panel; -fx-text-fill: -cc-text; -fx-font-size: 26px; }
+.instance-arrow, .home-notification-button { -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 12, 0.15, 0, 4); }
+.instance-arrow:hover, .home-notification-button:hover { -fx-background-color: -cc-nav-hover; }
+.news-card-content { -fx-padding: 20; -fx-background-color: -cc-content; -fx-background-radius: 0 0 15 15; }
+.news-card:hover { -fx-border-color: -cc-accent-secondary; }
+.news-card-category { -fx-text-fill: -cc-text; -fx-border-color: -cc-accent-tertiary; -fx-border-width: 0 0 2 0; -fx-padding: 0 0 6 0; -fx-font-size: 11px; -fx-font-weight: bold; }
+.news-card-title { -fx-font-size: 19px; -fx-font-weight: bold; }
+.news-card-description { -fx-font-size: 13px; -fx-text-fill: -cc-text-secondary; }
+.news-card-view-button { -fx-font-size: 12px; -fx-padding: 6 12; -fx-min-height: 36; }
+/* Account and honest unfinished-feature states. */
+.account-avatar { -fx-background-color: -cc-accent; -fx-background-radius: 16; }
+.account-avatar-letter { -fx-text-fill: -cc-button-text; -fx-font-size: 32px; -fx-font-weight: bold; }
+.account-name { -fx-font-size: 28px; -fx-font-weight: bold; }
+.account-badge { -fx-font-size: 11px; -fx-font-weight: bold; }
+.empty-state { -fx-padding: 40; }
+.empty-title { -fx-font-size: 26px; -fx-font-weight: bold; }
+.status-chip { -fx-text-fill: -cc-accent-secondary; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 8 12; -fx-background-color: -cc-content; -fx-background-radius: 6; }
+.success { -fx-text-fill: -cc-success; }
+.error { -fx-text-fill: -cc-error; }
+.warning { -fx-text-fill: -cc-warning; }
+/* Settings keep one scroll surface and wrap color controls in narrow windows. */
+.tab-pane .tab-header-background { -fx-background-color: -cc-background; }
+.tab-pane .tab-header-area { -fx-padding: 0; }
+.tab { -fx-background-color: -cc-panel; -fx-background-radius: 8 8 0 0; -fx-padding: 10 20; -fx-border-color: transparent; -fx-border-width: 0 0 3 0; }
+.tab:selected { -fx-background-color: -cc-content; -fx-border-color: -cc-accent-secondary; }
+.tab .tab-label { -fx-text-fill: -cc-text; }
+.tab-pane .tab-content-area { -fx-background-color: -cc-background; }
+.color-row { -fx-background-color: -cc-card; -fx-background-radius: 8; -fx-padding: 12; }
+.color-group { -fx-padding: 16 0 0 0; }
+/* This pseudo-class is driven by the logical scene width (DPI aware). */
+.app-shell:compact .page { -fx-padding: 20; }
+.app-shell:compact .page-title { -fx-font-size: 25px; }
+.app-shell:compact .home-instance-title, .app-shell:compact .instance-title { -fx-font-size: 30px; }
+.app-shell:compact .surface-card { -fx-padding: 20; }
+.app-shell:compact .hero-copy { -fx-padding: 20; }
+
+.app-shell:short .sidebar { -fx-padding: 12; -fx-spacing: 4; }
+.app-shell:short .brand { -fx-padding: 0 0 8 0; }
+.app-shell:short .sidebar .nav-button { -fx-pref-height: 40; -fx-min-height: 40; -fx-padding: 6 12; }
+
+/* Content logos keep a fixed box without the padding of a full card. */
+.content-icon { -fx-background-color: -cc-panel; -fx-background-radius: 8; -fx-padding: 0; }
+
+/* Instance navigation and data surfaces, including loading and disabled states. */
+.content-tabs .button:selected { -fx-background-color: -cc-accent; -fx-border-color: -cc-accent-secondary; }
+.content-list { -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: -cc-border; -fx-padding: 4; }
+.content-list .list-cell { -fx-padding: 14 12; }
+.progress-bar, .progress-bar .track, .progress-bar .bar { -fx-background-radius: 8; -fx-border-radius: 8; }
+.instance-advanced > .title { -fx-background-color: -cc-panel; -fx-background-radius: 10; -fx-padding: 12 16; }
+.instance-advanced { -fx-text-fill: -cc-text; }
+.instance-advanced > .content { -fx-background-color: -cc-content; -fx-border-color: -cc-border; -fx-padding: 16; }
+.instance-advanced > .title > .arrow-button .arrow { -fx-background-color: -cc-text; }
+
+.instance-creation-dialog { -fx-background-color: -cc-background; -fx-border-color: -cc-border; -fx-border-width: 1; -fx-padding: 0; }
+.instance-creation-dialog > .button-bar { -fx-padding: 16 24 24 24; }
+.instance-creation-dialog .radio-button { -fx-text-fill: -cc-text; }
+.instance-creation-dialog .radio-button .radio { -fx-background-color: -cc-panel; -fx-padding: 6; }
+.instance-creation-dialog .radio-button:selected .radio { -fx-background-color: -cc-accent; }
+.instance-creation-dialog .radio-button:selected .dot { -fx-background-color: -cc-text; }

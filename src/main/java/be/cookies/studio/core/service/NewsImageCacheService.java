@@ -57,6 +57,14 @@ public class NewsImageCacheService {
         );
     }
 
+    NewsImageCacheService(Path directory) { cacheDirectory=directory; }
+
+    static boolean allowed(URI uri) {
+        return "https".equalsIgnoreCase(uri.getScheme()) && "ethemkalayci.github.io".equalsIgnoreCase(uri.getHost())
+            && uri.getPort()==-1 && uri.getUserInfo()==null && uri.equals(uri.normalize())
+            && (uri.getPath().startsWith("/cookie-core-data/news/images/") || uri.getPath().startsWith("/cookie-core-data/instances/images/"));
+    }
+
     public CompletableFuture<Path> resolve(String imageUrl) {
 
         return CompletableFuture.supplyAsync(() -> {
@@ -83,11 +91,7 @@ public class NewsImageCacheService {
         }
 
         // Accepter uniquement les images du dépôt officiel.
-        if (!"https".equalsIgnoreCase(uri.getScheme())
-                || !"ethemkalayci.github.io".equalsIgnoreCase(uri.getHost())
-                || uri.getPort() != -1
-                || !uri.getPath().startsWith(
-                "/cookie-core-data/news/images/")) {
+        if (!allowed(uri)) {
 
             throw new IOException("Source d'image non autorisée");
         }

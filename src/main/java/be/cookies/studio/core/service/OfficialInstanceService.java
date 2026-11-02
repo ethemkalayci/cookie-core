@@ -1,57 +1,53 @@
-
 package be.cookies.studio.core.service;
-
-import be.cookies.studio.core.model.ModLoader;
-import be.cookies.studio.core.model.OfficialInstance;
+import be.cookies.studio.core.model.*;
 import com.google.gson.*;
-
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.net.http.*;
+import java.nio.file.*;
+import java.time.*;
+import java.util.*;
 
 public class OfficialInstanceService {
-
-    private static final String INSTANCE_URL =
-            "https://ethemkalayci.github.io/cookie-core-data/instances/instances.json";
-
-    private final HttpClient httpClient = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(5))
-            .build();
-
-    public List<OfficialInstance> loadOfficialInstances()
-            throws IOException, InterruptedException {
-
-        // Construction de la requête HTTP
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(INSTANCE_URL))
-                .timeout(Duration.ofSeconds(10))
-                .GET()
-                .build();
-
-        // Envoi de la requête
-        HttpResponse<String> response = httpClient.send(
-                request,
-                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8)
-        );
-
-        // Vérification du statut HTTP
-        if (response.statusCode() != 200) {
-            throw new IOException(
-                    "Erreur HTTP : " + response.statusCode()
-            );
+    static final String INSTANCE_URL="https://ethemkalayci.github.io/cookie-core-data/instances/instances.json";
+    public record Catalog(List<OfficialInstance> instances,boolean offline,Instant savedAt,String message){}
+    interface Fetch {String get() throws IOException,InterruptedException;}
+    private final Path cache;private final Fetch fetch;
+    public OfficialInstanceService(){this(new PrismLauncherService().getDataDirectory().getParent(),()->{
+        var request=HttpRequest.newBuilder(URI.create(INSTANCE_URL)).timeout(Duration.ofSeconds(12)).GET().build();
+        var client=HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
+        var response=client.send(request,HttpResponse.BodyHandlers.ofInputStream());
+        try(var in=response.body()){
+            if(response.statusCode()!=200)throw new IOException("Catalogue HTTP "+response.statusCode());
+            byte[] body=in.readNBytes(2_000_001);if(body.length>2_000_000)throw new IOException("Catalogue trop volumineux");return new String(body,java.nio.charset.StandardCharsets.UTF_8);
         }
-
+    });}
+    OfficialInstanceService(Path root,Fetch fetch){cache=root.resolve("official-catalog-cache.json");this.fetch=fetch;}
+    public List<OfficialInstance> loadOfficialInstances() throws IOException,InterruptedException{return loadCatalog().instances();}
+    public Catalog loadCatalog() throws IOException,InterruptedException {
+        try{
+            String body=fetch.get();var instances=parse(body);var envelope=new JsonObject();envelope.addProperty("savedAt",Instant.now().toString());envelope.add("catalog",JsonParser.parseString(body));
+            InstanceFiles.writeJson(cache,envelope);return new Catalog(instances,false,Instant.parse(envelope.get("savedAt").getAsString()),"Catalogue à jour");
+        }catch(IOException|RuntimeException failure){
+            try{
+                var saved=InstanceFiles.readJson(cache,JsonObject.class);var instances=parse(saved.get("catalog").toString());var date=Instant.parse(saved.get("savedAt").getAsString());
+                return new Catalog(instances,true,date,"Hors ligne — dernier catalogue valide du "+date);
+            }catch(Exception ignored){throw new IOException("Catalogue indisponible et aucun cache valide. Les installations locales restent accessibles.",failure);}
+        }
+    }
+    /** Read the validated last catalog without waiting for the network. Call off the FX thread. */
+    public Optional<Catalog> cachedCatalog() {
+        try {
+            var saved=InstanceFiles.readJson(cache,JsonObject.class);
+            var instances=parse(saved.get("catalog").toString());
+            var date=Instant.parse(saved.get("savedAt").getAsString());
+            return Optional.of(new Catalog(instances,true,date,"Catalogue enregistré"));
+        } catch (Exception ignored) { return Optional.empty(); }
+    }
+    static List<OfficialInstance> parse(String body) throws IOException {
         try {
             // Analyse du JSON
-            JsonElement root = JsonParser.parseString(response.body());
+            JsonElement root = JsonParser.parseString(body);
 
             if (!root.isJsonArray()) {
                 throw new IOException(
@@ -158,8 +154,7 @@ public class OfficialInstanceService {
 
             return instances;
 
-        } catch (JsonParseException | IllegalArgumentException |
-                 IllegalStateException e) {
+        } catch (RuntimeException e) {
 
             throw new IOException(
                     "Le catalogue des instances officielles est invalide.",

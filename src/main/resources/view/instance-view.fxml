@@ -1,230 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.TilePane?>
-<?import javafx.scene.layout.VBox?>
-
-<ScrollPane fx:id="instanceScrollPane"
-            fitToWidth="true"
-            hbarPolicy="NEVER"
-            vbarPolicy="AS_NEEDED"
-            stylesheets="@../css/style.css"
-            styleClass="instance-scroll"
-            xmlns="http://javafx.com/javafx/25"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="be.cookies.studio.core.controller.InstanceController">
-
-    <content>
-        <VBox fillWidth="true" spacing="0.0">
-            <children>
-
-                <!-- =====================================
-                     INSTANCES OFFICIELLES — CARROUSEL
-                     ===================================== -->
-
-                <StackPane fx:id="bannerPane"
-                           minHeight="600.0"
-                           prefHeight="600.0"
-                           maxHeight="600.0"
-                           styleClass="instance-banner">
-
-                    <children>
-
-                        <!-- Zone accueillant les diapositives -->
-                        <Pane fx:id="slidesContainer"
-                              mouseTransparent="true">
-
-                            <children>
-
-                                <!-- Diapositive actuellement affichée -->
-                                <StackPane fx:id="currentSlide"
-                                           prefHeight="600.0">
-
-                                    <children>
-
-                                        <!-- Image dynamique -->
-                                        <ImageView fx:id="instanceBannerImage"
-                                                   preserveRatio="true"
-                                                   smooth="true"
-                                                   mouseTransparent="true" />
-
-                                        <!-- Dégradé diagonal -->
-                                        <Region mouseTransparent="true"
-                                                styleClass="banner-gradient" />
-
-                                        <!-- Fondu inférieur -->
-                                        <Region prefHeight="180.0"
-                                                maxHeight="180.0"
-                                                mouseTransparent="true"
-                                                styleClass="banner-bottom-fade"
-                                                StackPane.alignment="BOTTOM_CENTER" />
-
-                                        <!-- Informations -->
-                                        <VBox alignment="BOTTOM_LEFT"
-                                              mouseTransparent="true"
-                                              spacing="12.0"
-                                              StackPane.alignment="BOTTOM_LEFT">
-
-                                            <padding>
-                                                <Insets bottom="65.0"
-                                                        left="60.0"
-                                                        right="60.0"
-                                                        top="30.0" />
-                                            </padding>
-
-                                            <children>
-
-                                                <Label fx:id="instanceNameLabel"
-                                                       styleClass="instance-title"
-                                                       text="MontDino" />
-
-                                                <Label fx:id="instanceVersionLabel"
-                                                       styleClass="instance-version"
-                                                       text="Minecraft 1.20.1 • Forge 47.4.28" />
-
-                                            </children>
-                                        </VBox>
-
-                                    </children>
-                                </StackPane>
-
-                            </children>
-                        </Pane>
-
-                        <!-- =====================================
-                             NAVIGATION FIXE
-                             ===================================== -->
-
-                        <HBox fx:id="navigationOverlay"
-                              alignment="CENTER"
-                              spacing="20.0"
-                              StackPane.alignment="CENTER">
-
-                            <padding>
-                                <Insets left="20.0" right="20.0" />
-                            </padding>
-
-                            <children>
-
-                                <Button fx:id="previousInstanceButton"
-                                        mnemonicParsing="false"
-                                        styleClass="instance-arrow"
-                                        text="❮" />
-
-                                <Region HBox.hgrow="ALWAYS" />
-
-                                <Button fx:id="nextInstanceButton"
-                                        mnemonicParsing="false"
-                                        styleClass="instance-arrow"
-                                        text="❯" />
-
-                            </children>
-                        </HBox>
-
-                        <!-- =====================================
-                             BOUTON PRINCIPAL FIXE
-                             ===================================== -->
-
-                        <Button fx:id="instancePlayButton"
-                                mnemonicParsing="false"
-                                styleClass="instance-play-button"
-                                text="Installer"
-                                StackPane.alignment="BOTTOM_CENTER">
-
-                            <StackPane.margin>
-                                <Insets bottom="30.0" />
-                            </StackPane.margin>
-
-                        </Button>
-
-                    </children>
-                </StackPane>
-
-                <!-- =====================================
-                     ACTIONS DES INSTANCES OFFICIELLES
-                     ===================================== -->
-
-                <HBox alignment="CENTER"
-                      spacing="20.0"
-                      styleClass="instance-actions">
-
-                    <padding>
-                        <Insets bottom="25.0"
-                                left="30.0"
-                                right="30.0"
-                                top="25.0" />
-                    </padding>
-
-                    <children>
-
-                        <Button mnemonicParsing="false"
-                                styleClass="instance-action-button"
-                                text="Mods" />
-
-                        <Button mnemonicParsing="false"
-                                styleClass="instance-action-button"
-                                text="Resource Packs" />
-
-                        <Button mnemonicParsing="false"
-                                styleClass="instance-action-button"
-                                text="Shaders" />
-
-                    </children>
-                </HBox>
-
-                <!-- =====================================
-                     MES INSTANCES
-                     ===================================== -->
-
-                <VBox fillWidth="true"
-                      spacing="20.0"
-                      styleClass="personal-instances-section">
-
-                    <padding>
-                        <Insets bottom="50.0"
-                                left="40.0"
-                                right="40.0"
-                                top="35.0" />
-                    </padding>
-
-                    <children>
-
-                        <HBox alignment="CENTER_LEFT"
-                              spacing="20.0">
-
-                            <children>
-
-                                <Label styleClass="personal-instances-title"
-                                       text="Mes instances" />
-
-                                <Region HBox.hgrow="ALWAYS" />
-
-                                <Button fx:id="addInstanceButton"
-                                        mnemonicParsing="false"
-                                        styleClass="add-instance-button"
-                                        text="+ Ajouter" />
-
-                            </children>
-                        </HBox>
-
-                        <TilePane fx:id="personalInstancesGrid"
-                                  alignment="TOP_LEFT"
-                                  hgap="20.0"
-                                  vgap="20.0"
-                                  prefColumns="3" />
-
-                    </children>
-                </VBox>
-
-            </children>
-        </VBox>
-    </content>
+<ScrollPane fx:id="instanceScrollPane" fitToWidth="true" hbarPolicy="NEVER" styleClass="instance-scroll" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="be.cookies.studio.core.controller.InstanceController">
+ <content><VBox spacing="24" styleClass="page">
+  <FlowPane fx:id="catalogNotice" visible="false" managed="false" hgap="12" vgap="8"><Label fx:id="catalogStatus" wrapText="true"/><Button fx:id="retryCatalogButton" text="Réessayer"/></FlowPane>
+  <StackPane fx:id="bannerPane" prefHeight="420" minHeight="360" styleClass="instance-banner">
+   <Pane fx:id="slidesContainer" mouseTransparent="true"><children>
+    <StackPane fx:id="currentSlide">
+     <ImageView fx:id="instanceBannerImage" preserveRatio="true" smooth="true" mouseTransparent="true"/>
+     <Region mouseTransparent="true" styleClass="banner-gradient"/>
+   <Region mouseTransparent="true" prefHeight="200" maxHeight="200" styleClass="banner-bottom-fade" StackPane.alignment="BOTTOM_CENTER"/>
+     <VBox alignment="CENTER_LEFT" spacing="12" maxHeight="-Infinity" maxWidth="600" styleClass="hero-copy" StackPane.alignment="CENTER_LEFT">
+      <StackPane.margin><Insets left="24" right="24" bottom="64" top="24"/></StackPane.margin>
+      <Label fx:id="instanceNameLabel" text="Chargement…" styleClass="instance-title" wrapText="true" minHeight="-Infinity"/>
+      <Label fx:id="instanceVersionLabel" styleClass="instance-version" wrapText="true" minHeight="-Infinity"/>
+     </VBox>
+    </StackPane>
+   </children></Pane>
+   <HBox fx:id="navigationOverlay" alignment="CENTER_LEFT" spacing="12" maxHeight="-Infinity" styleClass="hero-toolbar" StackPane.alignment="BOTTOM_CENTER">
+    <Button fx:id="instancePlayButton" text="Installer" styleClass="instance-play-button" wrapText="true"/>
+    <Region HBox.hgrow="ALWAYS" minWidth="0"/>
+    <Button fx:id="previousInstanceButton" text="‹" accessibleText="Instance précédente" styleClass="instance-arrow"/>
+    <Button fx:id="nextInstanceButton" text="›" accessibleText="Instance suivante" styleClass="instance-arrow"/>
+   </HBox>
+  </StackPane>
+  <VBox spacing="6"><Label fx:id="operationStatus" wrapText="true"/><ProgressBar fx:id="instanceProgress" visible="false" managed="false" maxWidth="Infinity"/></VBox>
+  <VBox spacing="12" styleClass="surface-card">
+   <Label text="Personnaliser ton expérience" styleClass="section-title"/>
+   <FlowPane hgap="12" vgap="12" styleClass="instance-actions,content-tabs">
+    <Button text="Mods" onAction="#manageMods" styleClass="secondary-button"/><Button text="Resource Packs" onAction="#manageResourcePacks" styleClass="secondary-button"/><Button text="Shaders" onAction="#manageShaders" styleClass="secondary-button"/>
+   </FlowPane>
+   <VBox fx:id="inlineContentsHost"/>
+   <Separator/>
+   <Button text="Gérer l’instance" onAction="#manageSelected" styleClass="secondary-button"/>
+   <Label text="Mise à jour, déplacement, sauvegarde et configuration de cette instance." wrapText="true" styleClass="muted"/>
+  </VBox>
+  <VBox spacing="16" styleClass="personal-instances-section">
+   <FlowPane hgap="24" vgap="12"><Label text="Mes instances" styleClass="section-title"/><Button fx:id="addInstanceButton" text="Créer" styleClass="secondary-button"/></FlowPane>
+   <Label fx:id="localStatus" text="Chargement des installations locales…" wrapText="true" styleClass="muted"/>
+   <TilePane fx:id="personalInstancesGrid" hgap="20" vgap="20" prefColumns="3"/>
+  </VBox>
+ </VBox></content>
 </ScrollPane>

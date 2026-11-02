@@ -166,13 +166,31 @@ class PrismLauncherServiceTest {
     }
 
     @Test
-    void rejectsMissingModsAfterInstallation() throws Exception {
+    void allowsIntentionalModRemovalWithManagedManifest() throws Exception {
         PrismLauncherService service = new PrismLauncherService(temp.resolve("cookie-core"));
         String id = service.installModpack(montDino(), archive(fullPack()));
         assertTrue(service.installedInstanceId(montDino()).isPresent());
         Files.delete(service.getDataDirectory().resolve("instances").resolve(id)
                 .resolve(".minecraft/mods/example.jar"));
-        assertFalse(service.installedInstanceId(montDino()).isPresent());
+        assertTrue(service.installedInstanceId(montDino()).isPresent(), "Le retrait personnel est conservé et ne doit pas bloquer tout lancement");
     }
 
+
+    @Test void installsNewPackOutsidePrismAndRetainsOldInstance() throws Exception {
+        Path root = temp.resolve("cookie-core");
+        var service = new PrismLauncherService(root);
+        service.installModpack(montDino(), archive(fullPack()));
+        Path old=service.getDataDirectory().resolve("instances/cookiecore-official-1");
+        Files.writeString(old.resolve("player-save.txt"), "precious");
+        Path external=temp.resolve("external packs");
+        new SettingsService(root).update(c->c.minecraft(2048,external.toString()));
+        var second=new OfficialInstance(2,"1.20.1","1.0.0",ModLoader.FORGE,"47.4.28","Second","","https://example.org/pack.zip","a".repeat(64));
+        String id=service.installModpack(second,archive(fullPack()));
+        Path actual=external.resolve(id),alias=service.getDataDirectory().resolve("instances").resolve(id);
+        assertTrue(Files.isSameFile(actual,alias));assertTrue(service.installedInstanceId(second).isPresent());
+        assertEquals("2048",PrismConfig.read(actual.resolve("instance.cfg")).get("MaxMemAlloc"));
+        new SettingsService(root).update(c->c.minecraft(3072,""));
+        assertTrue(service.installedInstanceId(second).isPresent());
+        assertTrue(service.installedInstanceId(montDino()).isPresent());assertEquals("precious",Files.readString(old.resolve("player-save.txt")));
+    }
 }

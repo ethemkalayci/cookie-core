@@ -8,14 +8,13 @@
 <?import javafx.scene.layout.VBox?>
 <VBox xmlns="http://javafx.com/javafx/25"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="be.cookies.studio.core.controller.NewsCardController"
+      fx:controller="be.cookies.studio.core.controller.NewsCardController" fx:id="newsCardRoot"
       minWidth="280.0"
       prefWidth="280.0"
-      maxWidth="280.0"
-      minHeight="380.0"
+      maxWidth="Infinity"
+      minHeight="360.0"
       maxHeight="Infinity"
-      styleClass="news-card"
-      stylesheets="@../css/style.css">
+      styleClass="news-card">
    <children>
       <!-- Image de l'actualité -->
       <ImageView fx:id="newsImage"
@@ -57,7 +56,7 @@
                   <!-- Espace flexible horizontal -->
                   <Region HBox.hgrow="ALWAYS"/>
                   <Button fx:id="viewNewsButton"
-                          text="Voir"
+                          text="Lire →"
                           mnemonicParsing="false"
                           styleClass="news-card-view-button"
                           onAction="#openNews"/>

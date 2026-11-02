@@ -19,6 +19,24 @@ import java.time.format.DateTimeFormatter;
 public class NewsCardController {
 
     private static final double IMAGE_WIDTH = 280;
+    @FXML private javafx.scene.layout.VBox newsCardRoot;
+
+    @FXML private void initialize() {
+        // Keep the image inside the border, whose width is included in the VBox insets.
+        newsImage.fitWidthProperty().bind(javafx.beans.binding.Bindings.createDoubleBinding(
+                () -> Math.max(0, newsCardRoot.getWidth() - newsCardRoot.getInsets().getLeft() - newsCardRoot.getInsets().getRight()),
+                newsCardRoot.widthProperty(), newsCardRoot.insetsProperty()));
+        newsImage.fitHeightProperty().bind(newsImage.fitWidthProperty().multiply(IMAGE_HEIGHT / IMAGE_WIDTH));
+        newsCardRoot.widthProperty().addListener((o, a, b) -> { if (newsImage.getImage() != null) applyImageCrop(newsImage.getImage()); });
+        var clip = new javafx.scene.shape.Rectangle();
+        // Round only the image's upper corners. Extending the clip below the image
+        // keeps its lower edge straight. Never clip the card's outer border.
+        clip.setArcWidth(30); clip.setArcHeight(30);
+        clip.widthProperty().bind(newsImage.fitWidthProperty());
+        clip.heightProperty().bind(newsImage.fitHeightProperty().add(15));
+        newsImage.setClip(clip);
+        be.cookies.studio.core.ui.ViewSupport.cardHover(newsCardRoot);
+    }
     private static final double IMAGE_HEIGHT = 145;
 
     private static final DateTimeFormatter DATE_FORMATTER =
@@ -61,8 +79,6 @@ public class NewsCardController {
                 news.getPublicationDate().format(DATE_FORMATTER)
         );
 
-        newsImage.setFitWidth(IMAGE_WIDTH);
-        newsImage.setFitHeight(IMAGE_HEIGHT);
         newsImage.setPreserveRatio(true);
         newsImage.setSmooth(true);
         newsImage.setViewport(null);

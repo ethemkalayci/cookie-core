@@ -1,18 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
-<?import javafx.scene.text.Font?>
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="be.cookies.studio.core.controller.SettingsController">
-    <children>
-        <Label layoutX="227.0" layoutY="166.0" text="settings">
-            <font>
-                <Font size="46.0" />
-            </font>
-        </Label>
-    </children>
-</AnchorPane>
+<?import javafx.geometry.Insets?>
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="home-scroll" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="be.cookies.studio.core.controller.SettingsController">
+<content><VBox fx:id="settingsContent" spacing="22" styleClass="page,settings-page">
+<VBox spacing="6"><Label text="À TA FAÇON" styleClass="eyebrow"/>
+<Label text="Paramètres" styleClass="page-title"/>
+<Label text="Personnalise ton interface et prépare tes prochaines sessions." wrapText="true" styleClass="page-description"/></VBox><Label fx:id="status" wrapText="true" styleClass="status-message"/>
+<TabPane tabClosingPolicy="UNAVAILABLE">
+<tabs>
+<Tab text="Apparence"><content><VBox spacing="20">
+<padding><Insets top="24" right="12" bottom="24" left="12"/></padding>
+<Label text="Thème actif" styleClass="settings-heading"/>
+<ComboBox fx:id="themes" prefWidth="340"/>
+<Label text="Le thème choisi est appliqué immédiatement et conservé au redémarrage." wrapText="true" styleClass="muted"/>
+<Separator/>
+<Label text="Créer ou modifier un thème personnel" styleClass="settings-heading"/>
+<Label text="Les huit thèmes officiels restent intacts. Les modifications ci-dessous sont prévisualisées jusqu'à leur enregistrement." wrapText="true"/>
+<FlowPane hgap="14" vgap="12"><Label text="Palette de base"/><ComboBox fx:id="baseTheme" prefWidth="180"/><TextField fx:id="themeName" promptText="Nom de ton thème" prefWidth="230"/></FlowPane>
+<Label fx:id="contrastWarning" wrapText="true" styleClass="warning"/>
+<FlowPane hgap="12" vgap="12"><Button text="Enregistrer le thème" onAction="#saveTheme"/><Button styleClass="secondary-button" text="Annuler l'aperçu" onAction="#cancelPreview"/><Button styleClass="secondary-button" text="Réinitialiser toutes les couleurs" onAction="#resetAll"/><Button styleClass="secondary-button" fx:id="deleteTheme" text="Supprimer le thème personnel" onAction="#deleteTheme"/></FlowPane>
+<VBox fx:id="colorRows" spacing="12"/>
+</VBox></content></Tab>
+<Tab text="Minecraft et stockage"><content><VBox spacing="20">
+<padding><Insets top="24" right="12" bottom="24" left="12"/></padding>
+<VBox spacing="14" styleClass="settings-card,surface-card">
+<Label text="Mémoire Minecraft" styleClass="settings-heading"/>
+<Label fx:id="memoryInfo" wrapText="true"/>
+<CheckBox fx:id="useMemory" text="Utiliser une allocation par défaut Cookie Core"/>
+<Slider fx:id="ramSlider" showTickLabels="true" showTickMarks="true" maxWidth="650"/>
+<Label fx:id="ramValue"/>
+<Label text="Reprendre explicitement la gestion mémoire d’une instance existante" wrapText="true"/>
+<ComboBox fx:id="memoryTarget" promptText="Choisir une instance installée" maxWidth="650"/>
+<Button text="Utiliser le défaut enregistré pour cette instance" onAction="#adoptMemory"/>
+<Label text="Les réglages mémoire personnalisés dans Prism pour une instance restent prioritaires. Désactiver cette option laisse les réglages existants inchangés. Une nouvelle valeur est appliquée au prochain lancement ; ferme d'abord le Prism de Cookie Core s'il est ouvert." wrapText="true" styleClass="muted"/>
+</VBox>
+<VBox spacing="14" styleClass="settings-card,surface-card">
+<Label text="Dossier des nouvelles instances" styleClass="settings-heading"/>
+<TextField fx:id="installPath" promptText="Vide : utiliser le dossier par défaut"/>
+<Label fx:id="defaultPath" wrapText="true" styleClass="muted"/>
+<FlowPane hgap="12" vgap="12"><Button text="Choisir un dossier…" onAction="#chooseDirectory"/><Button text="Revenir au dossier par défaut" onAction="#defaultDirectory"/></FlowPane>
+<Label text="Seules les nouvelles installations utilisent ce dossier. Les instances et sauvegardes existantes restent à leur emplacement. Sous Windows, un lien de dossier permet à Prism de retrouver chaque nouvelle instance." wrapText="true"/>
+</VBox>
+<Button text="Enregistrer Minecraft et stockage" onAction="#saveMinecraft"/>
+</VBox></content></Tab>
+</tabs></TabPane>
+</VBox></content></ScrollPane>

@@ -1,78 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.VBox?>
-
-<AnchorPane prefHeight="400.0" prefWidth="600.0" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="be.cookies.studio.core.controller.ShellController">
-   <children>
-      <BorderPane prefHeight="400.0" prefWidth="140.0" styleClass="sidebar-separator" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <left>
-            <VBox prefHeight="200.0" prefWidth="230.0" spacing="12.0" styleClass="sidebar" BorderPane.alignment="CENTER">
-               <padding>
-                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-               </padding>
-               <children>
-                  <HBox prefHeight="39.0" prefWidth="190.0">
-                     <children>
-                        <Label text="COOKIE CORE">
-                           <graphic>
-                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../images/logo/logo-core.png" />
-                                 </image>
-                              </ImageView>
-                           </graphic>
-                           <HBox.margin>
-                              <Insets />
-                           </HBox.margin></Label>
-                     </children></HBox>
-                  <Separator prefWidth="200.0" />
-                <Button fx:id="accueilButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="btn" text="Accueil">
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
-                  </Button>
-                <Button fx:id="instancesButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="btn" text="Instances">
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
-                  </Button>
-                <Button fx:id="vanillaButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="btn" text="Minecraft Vanilla">
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
-                  </Button>
-                <Button fx:id="downloadsButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="btn" text="Téléchargements">
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
-                  </Button>
-                  <Region prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
-                <Button fx:id="settingsButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="btn" text="Paramètres">
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
-                  </Button>
-                  <Button fx:id="accountButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="btn" text="Compte Minecraft">
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
-                  </Button>
-               </children>
-            </VBox>
-         </left>
-         <center>
-            <BorderPane fx:id="contentContainer" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-         </center>
-      </BorderPane>
-   </children>
-</AnchorPane>
+<BorderPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="be.cookies.studio.core.controller.ShellController" styleClass="app-shell" fx:id="shellRoot">
+ <left><ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="sidebar-scroll" fx:id="sidebarScroll" prefWidth="232" minWidth="232" maxWidth="232">
+ <content><VBox styleClass="sidebar" fx:id="sidebarContent" spacing="8" minHeight="0">
+  <HBox alignment="CENTER_LEFT" spacing="12" styleClass="brand">
+   <ImageView fitWidth="36" fitHeight="36" preserveRatio="true"><image><Image url="@../images/logo/logo-core.png"/></image></ImageView>
+   <VBox spacing="2"><Label text="COOKIE CORE" styleClass="brand-title"/><Label text="COOKIES STUDIO" styleClass="brand-caption"/></VBox>
+  </HBox>
+  <Label text="EXPLORER" styleClass="nav-caption"/>
+  <Button fx:id="accueilButton" text="Accueil" maxWidth="Infinity" styleClass="nav-button"/>
+  <Button fx:id="instancesButton" text="Instances" maxWidth="Infinity" styleClass="nav-button"/>
+  <Button fx:id="vanillaButton" text="Minecraft Vanilla" maxWidth="Infinity" styleClass="nav-button"/>
+  <Button fx:id="downloadsButton" text="Téléchargements" maxWidth="Infinity" styleClass="nav-button"/>
+  <Region minHeight="0" VBox.vgrow="ALWAYS"/>
+  <Separator/>
+  <Label text="TON ESPACE" styleClass="nav-caption"/>
+  <Button fx:id="settingsButton" text="Paramètres" maxWidth="Infinity" styleClass="nav-button"/>
+  <Button fx:id="accountButton" text="Compte Minecraft" maxWidth="Infinity" styleClass="nav-button"/>
+ </VBox></content></ScrollPane></left>
+ <center><BorderPane fx:id="contentContainer" minWidth="0" styleClass="page-host"/></center>
+</BorderPane>

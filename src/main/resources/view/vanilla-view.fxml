@@ -1,18 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
-<?import javafx.scene.text.Font?>
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="be.cookies.studio.core.controller.VanillaController">
-    <children>
-        <Label layoutX="227.0" layoutY="166.0" text="Vanilla">
-            <font>
-                <Font size="46.0" />
-            </font>
-        </Label>
-    </children>
-</AnchorPane>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
+<ScrollPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="be.cookies.studio.core.controller.VanillaController" fitToWidth="true" hbarPolicy="NEVER" styleClass="home-scroll"><content><VBox spacing="28" styleClass="page">
+ <VBox spacing="6"><Label text="MINECRAFT JAVA EDITION" styleClass="eyebrow"/><Label text="Minecraft Vanilla" styleClass="page-title"/></VBox>
+ <VBox spacing="20" maxWidth="900" styleClass="empty-state,surface-card"><Label text="Le jeu, dans sa forme originale" styleClass="empty-title" wrapText="true"/><Label text="Crée une instance, choisis ta version Minecraft et garde le modloader Vanilla pour retrouver le jeu original." styleClass="page-description" wrapText="true"/><Button fx:id="libraryButton" text="Créer ou gérer une instance" onAction="#openLibrary"/><Separator/><Label text="Prism préparera les fichiers du jeu au premier lancement. Connecte ton compte dans Compte Minecraft pour jouer." wrapText="true" styleClass="muted"/></VBox>
+ </VBox></content></ScrollPane>

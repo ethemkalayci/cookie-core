@@ -66,35 +66,12 @@ public class PrismLauncherService {
 
     /** Le répertoire est indépendant de %APPDATA%/PrismLauncher. */
     public Optional<Path> findExecutable() {
-        String override = System.getenv("COOKIECORE_PRISM_EXECUTABLE");
-        if (override != null && !override.isBlank()) {
-            Path candidate = Path.of(override);
-            if (Files.isRegularFile(candidate)) return Optional.of(candidate);
-        }
-        Path root = dataDirectory.getParent();
-        List<Path> candidates = new ArrayList<>();
-        candidates.add(root.resolve("prism").resolve("prismlauncher.exe"));
-        candidates.add(root.resolve("prism").resolve("PrismLauncher.exe"));
-        String local = System.getenv("LOCALAPPDATA");
-        String programFiles = System.getenv("ProgramFiles");
-        String programFilesX86 = System.getenv("ProgramFiles(x86)");
-        if (local != null) {
-            candidates.add(Path.of(local, "Programs", "PrismLauncher", "prismlauncher.exe"));
-            candidates.add(Path.of(local, "PrismLauncher", "prismlauncher.exe"));
-        }
-        if (programFiles != null)
-            candidates.add(Path.of(programFiles, "PrismLauncher", "prismlauncher.exe"));
-        if (programFilesX86 != null)
-            candidates.add(Path.of(programFilesX86, "PrismLauncher", "prismlauncher.exe"));
-        return candidates.stream().filter(Files::isRegularFile).findFirst();
+        Path exe = PrismRuntime.executable(dataDirectory);
+        return Files.isRegularFile(exe) ? Optional.of(exe) : Optional.empty();
     }
 
-    private Path requireExecutable() throws IOException {
-        return findExecutable().orElseThrow(() -> new IOException(
-                "Prism Launcher introuvable. L'installation automatique de Prism n'est pas encore intégrée. "
-                        + "Configure COOKIECORE_PRISM_EXECUTABLE ou installe Prism."));
-    }
-
+    public Path prepareRuntime() throws IOException { return PrismRuntime.ensure(dataDirectory); }
+    private Path requireExecutable() throws IOException { return prepareRuntime(); }
     /** Identifiant permanent : ne dépend ni du nom ni de la version du modpack. */
     private static String prismId(OfficialInstance instance) {
         return "cookiecore-official-" + instance.getId();
@@ -106,7 +83,10 @@ public class PrismLauncherService {
 
     /** Un simple dossier Prism sans marqueur Cookie Core ne suffit PAS. */
     public Optional<String> installedInstanceId(OfficialInstance instance) throws IOException {
-        Path folder = instanceFolder(instance);
+        return validateInstalledFolder(instance, instanceFolder(instance));
+    }
+
+    private Optional<String> validateInstalledFolder(OfficialInstance instance, Path folder) throws IOException {
         Path marker = folder.resolve(INSTALL_MARKER);
         if (!Files.isRegularFile(marker, LinkOption.NOFOLLOW_LINKS)
                 || !Files.isRegularFile(folder.resolve("instance.cfg"), LinkOption.NOFOLLOW_LINKS)
@@ -122,15 +102,7 @@ public class PrismLauncherService {
                 || !instance.getSha256().equalsIgnoreCase(properties.getProperty("sha256", ""))) {
             return Optional.empty();
         }
-        if (instance.getModLoader() != ModLoader.VANILLA) {
-            long currentModCount = countMods(folder);
-            if (currentModCount == 0) return Optional.empty();
-            String expectedModCount = properties.getProperty("modJarCount");
-            if (expectedModCount != null
-                    && !expectedModCount.equals(Long.toString(currentModCount))) {
-                return Optional.empty();
-            }
-        }
+        if (!Files.exists(folder.resolve(PackManifest.FILE)) && instance.getModLoader() != ModLoader.VANILLA && countMods(folder)==0) return Optional.empty();
         return Optional.of(prismId(instance));
     }
 
@@ -144,7 +116,14 @@ public class PrismLauncherService {
      * L'archive provient du téléchargement HTTPS vérifié en SHA-256 par Cookie Core.
      * Aucun fichier existant n'est remplacé ; la publication n'a lieu qu'après validation.
      */
-    public synchronized String installModpack(OfficialInstance instance, Path archive)
+    public String installModpack(OfficialInstance instance, Path archive) throws IOException, InterruptedException {
+        try(var lock=new InstanceOperationLock(dataDirectory.getParent())){
+            if(instance!=null){new InstanceManager(dataDirectory.getParent()).noPending(prismId(instance));
+                if(Files.exists(dataDirectory.getParent().resolve("inventory").resolve(prismId(instance)+".json")))throw new IOException("Cette instance est déjà enregistrée. Ouvre la bibliothèque locale pour la mettre à jour, rétablir son lien ou récupérer une opération.");}
+            return installUnlocked(instance,archive);
+        }
+    }
+    private String installUnlocked(OfficialInstance instance, Path archive)
             throws IOException, InterruptedException {
         if (instance == null || !instance.isDownloadAvailable())
             throw new IOException("Cette instance ne possède pas de téléchargement disponible.");
@@ -154,7 +133,18 @@ public class PrismLauncherService {
             throw new IOException("Une instance Cookie Core existe déjà pour " + instance.getName()
                     + ". Aucune donnée n'a été écrasée. La mise à jour nécessite un mécanisme séparé.");
 
-        Path instancesDir = dataDirectory.resolve("instances");
+        var preferences = new SettingsService(dataDirectory.getParent()).current();
+        Path instancesDir = InstanceStorage.physicalRoot(dataDirectory, preferences.installDirectory());
+        Files.createDirectories(instancesDir);instancesDir=instancesDir.toRealPath();
+        Path physicalTarget = instancesDir.resolve(prismId(instance));
+        if (Files.exists(physicalTarget, LinkOption.NOFOLLOW_LINKS)) {
+            if (Files.isRegularFile(physicalTarget.resolve(INSTALL_MARKER))) {
+                if (validateInstalledFolder(instance, physicalTarget).isEmpty()) throw new IOException("Instance existante différente du catalogue : aucun lien créé.");
+                InstanceStorage.link(instanceFolder(instance), physicalTarget);
+                return installedInstanceId(instance).orElseThrow(() -> new IOException("Une instance différente existe dans le dossier choisi. Aucun fichier modifié."));
+            }
+            throw new IOException("Un dossier existe déjà à cet emplacement. Aucun fichier modifié.");
+        }
         Files.createDirectories(instancesDir);
         Path staging = Files.createTempDirectory(instancesDir, ".cookiecore-install-");
         boolean committed = false;
@@ -218,6 +208,7 @@ public class PrismLauncherService {
 
             validateInstalledFiles(staging, instance);
             assignUniqueInstanceUuid(staging);
+            MemorySettings.apply(staging, preferences.memoryMiB(), true, dataDirectory);
             Properties marker = new Properties();
             marker.setProperty("catalogId", Integer.toString(instance.getId()));
             marker.setProperty("modJarCount", Long.toString(countMods(staging)));
@@ -231,7 +222,10 @@ public class PrismLauncherService {
                 marker.store(output, "Instance officielle geree par Cookie Core");
             }
 
-            Path target = instanceFolder(instance);
+            PackManifest.write(staging,PackManifest.capture(staging,InstanceFiles.QUIET));
+            var local=InstanceManager.record(instance,physicalTarget);
+            InstanceInventory.stamp(local,staging);
+            Path target = physicalTarget;
             if (Files.exists(target, LinkOption.NOFOLLOW_LINKS))
                 throw new IOException("L'instance existe déjà, aucun écrasement effectué : " + target);
             try {
@@ -240,13 +234,15 @@ public class PrismLauncherService {
                 Files.move(staging, target);
             }
             committed = true;
+            new InstanceInventory(dataDirectory.getParent()).save(local);
+            InstanceStorage.link(instanceFolder(instance), target);
             return prismId(instance);
         } finally {
             if (!committed) deleteTree(staging);
         }
     }
 
-    private static String detectPrismExportPrefix(Set<String> lowerPaths, List<? extends ZipEntry> entries) {
+    static String detectPrismExportPrefix(Set<String> lowerPaths, List<? extends ZipEntry> entries) {
         if (lowerPaths.contains("instance.cfg") && lowerPaths.contains("mmc-pack.json"))
             return "";
         Set<String> roots = new HashSet<>();
@@ -268,7 +264,7 @@ public class PrismLauncherService {
         return null;
     }
 
-    private static void validateEntryName(String name) throws IOException {
+    static void validateEntryName(String name) throws IOException {
         if (name.isBlank() || name.startsWith("/") || name.startsWith("\\")
                 || name.contains("\\") || name.indexOf('\0') >= 0 || name.contains(":"))
             throw new IOException("Chemin interdit dans le ZIP : " + name);
@@ -278,7 +274,7 @@ public class PrismLauncherService {
         }
     }
 
-    private static boolean containsPersonalData(String name) {
+    static boolean containsPersonalData(String name) {
         String path = name.toLowerCase(Locale.ROOT);
         if (path.equals("accounts.json") || path.equals("prismlauncher.cfg")
                 || path.endsWith("/usercache.json")
@@ -295,7 +291,7 @@ public class PrismLauncherService {
     }
 
     /** Le répertoire réellement utilisé dépend du format d'export Prism. */
-    private static Path gameDirectory(Path instanceFolder) throws IOException {
+    static Path gameDirectory(Path instanceFolder) throws IOException {
         Path standard = instanceFolder.resolve("minecraft");
         Path legacy = instanceFolder.resolve(".minecraft");
         boolean hasStandard = Files.isDirectory(standard, LinkOption.NOFOLLOW_LINKS);
@@ -329,7 +325,7 @@ public class PrismLauncherService {
         Files.writeString(cfg, content);
     }
 
-    private static void validateInstalledFiles(Path staging, OfficialInstance instance) throws IOException {
+    static void validateInstalledFiles(Path staging, OfficialInstance instance) throws IOException {
         if (!Files.isRegularFile(staging.resolve("instance.cfg"))
                 || !Files.isRegularFile(staging.resolve("mmc-pack.json")))
             throw new IOException("Export Prism incomplet : instance.cfg ou mmc-pack.json absent.");
@@ -392,12 +388,77 @@ public class PrismLauncherService {
         }
     }
 
+    private void rejectLegacyProcess(Path executable) throws IOException {
+        for (ProcessHandle handle : ProcessHandle.allProcesses().toList()) {
+            var info = handle.info();
+            String command = info.command().orElse("");
+            if (!command.toLowerCase(Locale.ROOT).endsWith("prismlauncher.exe")) continue;
+            if (Path.of(command).toAbsolutePath().normalize().equals(executable.toAbsolutePath().normalize())) continue;
+            String[] args = info.arguments().orElse(new String[0]);
+            for (int i=0; i+1<args.length; i++) {
+                if ((args[i].equals("--dir") || args[i].equals("-d"))
+                        && Path.of(args[i+1]).toAbsolutePath().normalize().equals(dataDirectory)) {
+                    throw new IOException("Ferme la fenêtre Prism ouverte par l'ancienne version de Cookie Core, puis réessaie.");
+                }
+            }
+        }
+    }
+
+    public Process openAccountWindow() throws IOException {
+        Path exe = requireExecutable().toAbsolutePath();
+        rejectLegacyProcess(exe);
+        Files.createDirectories(dataDirectory);
+        return new ProcessBuilder(exe.toString(), "--dir", dataDirectory.toString())
+                .directory(exe.getParent().toFile())
+                .redirectOutput(ProcessBuilder.Redirect.DISCARD)
+                .redirectError(ProcessBuilder.Redirect.DISCARD).start();
+    }
+
+    /** Requests a normal Windows window close, never terminates a process forcibly. */
+    public void closeAccountWindow(Process process) throws IOException, InterruptedException {
+        if (process == null || !process.isAlive()) return;
+        if (!System.getProperty("os.name").startsWith("Windows")) return;
+        String command = "$p=Get-Process -Id " + process.pid()
+                + " -ErrorAction SilentlyContinue; if($p){[void]$p.CloseMainWindow()}";
+        Process close = new ProcessBuilder("powershell.exe", "-NoProfile", "-NonInteractive",
+                "-WindowStyle", "Hidden", "-Command", command)
+                .redirectOutput(ProcessBuilder.Redirect.DISCARD)
+                .redirectError(ProcessBuilder.Redirect.DISCARD).start();
+        close.waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
+        process.waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
+    }
+
+    void launchLocal(String id,Path folder) throws IOException {
+        if(!id.matches("cookiecore-(official-[1-9][0-9]*|personal-[a-f0-9-]{36})"))throw new IOException("Identifiant invalide");
+        MemorySettings.apply(folder,new SettingsService(dataDirectory.getParent()).current().memoryMiB(),false,dataDirectory);
+        Path exe=requireExecutable();rejectLegacyProcess(exe);
+        var profile=new PrismAccountService(dataDirectory).readSelected().orElseThrow(()->new IOException("Connecte ton compte Microsoft dans Compte Minecraft avant de jouer."));
+        new ProcessBuilder(exe.toString(),"--dir",dataDirectory.toString(),"--launch",id,"--profile",profile.name()).directory(exe.getParent().toFile()).redirectOutput(ProcessBuilder.Redirect.DISCARD).redirectError(ProcessBuilder.Redirect.DISCARD).start();
+    }
+    public void showInstance(String id) throws IOException {
+        if(!id.matches("cookiecore-(official-[1-9][0-9]*|personal-[a-f0-9-]{36})"))throw new IOException("Identifiant invalide");
+        Path exe=requireExecutable();rejectLegacyProcess(exe);
+        new ProcessBuilder(exe.toString(),"--dir",dataDirectory.toString(),"--show",id).directory(exe.getParent().toFile()).redirectOutput(ProcessBuilder.Redirect.DISCARD).redirectError(ProcessBuilder.Redirect.DISCARD).start();
+    }
     /** Lancement via l'exécutable officiel ; les comptes restent administrés dans Prism. */
     public void launchInstance(OfficialInstance instance) throws IOException {
+        if(Files.exists(dataDirectory.getParent().resolve("inventory").resolve(prismId(instance)+".json"))){new InstanceManager(dataDirectory.getParent()).launch(prismId(instance));return;}
         String id = installedInstanceId(instance).orElseThrow(
                 () -> new IOException("Instance absente ou version non conforme au catalogue."));
+        MemorySettings.apply(instanceFolder(instance), new SettingsService(dataDirectory.getParent()).current().memoryMiB(), false, dataDirectory);
         Path exe = requireExecutable();
-        new ProcessBuilder(exe.toString(), "--dir", dataDirectory.toString(), "--launch", id)
-                .directory(exe.getParent().toFile()).start();
+        rejectLegacyProcess(exe);
+        var profile = new PrismAccountService(dataDirectory).readSelected().orElseThrow(() -> new IOException("Connecte ton compte Microsoft avec le bouton Compte Minecraft et sélectionne-le dans Prism."));
+        new ProcessBuilder(exe.toAbsolutePath().toString(), "--dir", dataDirectory.toString(), "--launch", id, "--profile", profile.name())
+                .directory(exe.toAbsolutePath().getParent().toFile())
+                .redirectOutput(ProcessBuilder.Redirect.DISCARD).redirectError(ProcessBuilder.Redirect.DISCARD).start();
+        // The CLI has accepted the launch request; this is not a game-running signal.
+        try { new LastInstanceService(dataDirectory.getParent()).save(instance, java.time.Instant.now()); }
+        catch (IOException e) { System.err.println("Lancement demandé, mais historique non enregistré : " + e.getMessage()); }
     }
 }
+
+
+
+
+

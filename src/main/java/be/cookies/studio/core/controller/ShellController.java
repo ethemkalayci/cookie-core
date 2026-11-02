@@ -2,31 +2,43 @@ package be.cookies.studio.core.controller;
 
 import javafx.application.HostServices;
 import javafx.animation.*;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.paint.Color;
-import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URL;
-import javafx.scene.Group;
 import org.girod.javafx.svgimage.SVGLoader;
 
-import javax.swing.text.AbstractDocument;
 
-import static javafx.fxml.FXMLLoader.load;
 
 public class ShellController {
+    private final boolean backgroundLoading;
+    public ShellController() { this(true); }
+    ShellController(boolean backgroundLoading) { this.backgroundLoading = backgroundLoading; }
+    @FXML private BorderPane shellRoot;
+    @FXML private javafx.scene.control.ScrollPane sidebarScroll;
+    @FXML private javafx.scene.layout.VBox sidebarContent;
+    private FadeTransition pageTransition;
+    private void configureLoader(FXMLLoader loader) {
+        if (backgroundLoading) return;
+        loader.setControllerFactory(type -> {
+            if (type == HomeController.class) return new HomeController(false);
+            if (type == InstanceController.class) return new InstanceController(false);
+            if (type == AccountController.class) return new AccountController(false);
+            try { return type.getConstructor().newInstance(); }
+            catch (ReflectiveOperationException error) { throw new IllegalStateException(error); }
+        });
+    }
+    private void present(Parent page) {
+        if (pageTransition != null) { pageTransition.stop(); pageTransition.getNode().setOpacity(1); }
+        contentContainer.setCenter(page);
+        pageTransition = be.cookies.studio.core.ui.ViewSupport.reveal(page);
+    }
+
 
     @FXML
     private Button accueilButton;
@@ -44,6 +56,7 @@ public class ShellController {
     @FXML
     private BorderPane contentContainer;
 
+    private SettingsController settingsController;
     private Button activeButton;
     private HostServices hostServices;
 
@@ -56,6 +69,14 @@ public class ShellController {
 
     @FXML
     private void initialize() {
+        var compact = javafx.css.PseudoClass.getPseudoClass("compact");
+        shellRoot.widthProperty().addListener((observable, before, after) -> shellRoot.pseudoClassStateChanged(compact, after.doubleValue() < 1150));
+        shellRoot.heightProperty().addListener((observable, before, after) -> {
+            boolean shortWindow = after.doubleValue() < 620;
+            shellRoot.pseudoClassStateChanged(javafx.css.PseudoClass.getPseudoClass("short"), shortWindow);
+            for (var caption : shellRoot.lookupAll(".nav-caption")) { caption.setVisible(!shortWindow); caption.setManaged(!shortWindow); }
+        });
+        sidebarScroll.viewportBoundsProperty().addListener((observable, before, after) -> sidebarContent.setMinHeight(after.getHeight()));
         loadView("home-view.fxml");
 
         accueilButton.setGraphic(loadIcon("home.svg"));
@@ -85,15 +106,36 @@ public class ShellController {
             selectButton(settingsButton);
             loadView("settings-view.fxml");
         });
-        accountButton.setOnAction(event -> {
-            selectButton(accountButton);
-            loadView("account-view.fxml");
-        });
+        accountButton.setOnAction(event -> showAccount(null));
 
         selectButton(accueilButton);
     }
 
+    private void showAccount(Runnable afterConnection) {
+        if (settingsController != null) { settingsController.dispose(); settingsController = null; }
+        selectButton(accountButton);
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/account-view.fxml"));
+            configureLoader(loader);
+            Parent page = loader.load();
+            AccountController controller = loader.getController();
+            Runnable connected = () -> {
+                selectButton(accueilButton); loadView("home-view.fxml");
+                if (afterConnection != null) afterConnection.run();
+            };
+            controller.setOnConnected(connected);
+            present(page);
+            if (afterConnection != null) controller.begin(connected);
+        } catch (IOException e) {
+            var alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR,
+                    "Impossible d'ouvrir la page de connexion.");
+            be.cookies.studio.core.service.ThemeService.attach(alert);
+            alert.show();
+        }
+    }
+
     private void loadView(String fileName){
+        if (settingsController != null) { settingsController.dispose(); settingsController = null; }
         URL ressource = getClass().getResource("/view/"+fileName);
         if (ressource == null){
             IO.println("le fichier cible n'est pas trouvé");
@@ -101,14 +143,22 @@ public class ShellController {
         }
         FXMLLoader file = new FXMLLoader(ressource);
         try{
+            configureLoader(file);
             Parent page = file.load();
 
             if (fileName.equals("home-view.fxml")) {
                 HomeController homeController = file.getController();
                 homeController.setHostServices(hostServices);
+                homeController.setInstanceActions(() -> { selectButton(instancesButton); loadView("instance-view.fxml"); }, this::showAccount);
             }
 
-            contentContainer.setCenter(page);
+            if (file.getController() instanceof InstanceController controller) {
+                controller.setAccountRequest(this::showAccount);
+                controller.setOnLaunched(() -> { selectButton(accueilButton); loadView("home-view.fxml"); });
+            }
+            if (file.getController() instanceof VanillaController controller) controller.setAccountRequest(this::showAccount);
+            if (file.getController() instanceof SettingsController controller) settingsController = controller;
+            present(page);
         }catch (IOException e){
             e.printStackTrace();
         }
@@ -133,7 +183,7 @@ public class ShellController {
             svg.setScaleX(scale);
             svg.setScaleY(scale);
 
-            return new Group(svg);
+            Group icon = new Group(svg); icon.getStyleClass().add("theme-icon"); return icon;
         } catch (Exception exception) {
             throw new IllegalStateException(
                     "Impossible de charger " + fileName,
@@ -150,80 +200,13 @@ public class ShellController {
 
         if (activeButton != null) {
             activeButton.getStyleClass().remove("active");
-            animateButton(activeButton, 1.0);
+
         }
 
         selectedButton.getStyleClass().add("active");
-        animateButton(selectedButton, 1.05);
+
 
         activeButton = selectedButton;
     }
 
-    private void animateButton(Button btn, double target) {
-
-        Duration duration = Duration.millis(300);
-
-        // 1. Animation de l'échelle
-        ScaleTransition scaleAnimation =
-                new ScaleTransition(duration, btn);
-
-        scaleAnimation.setToX(target);
-        scaleAnimation.setToY(target);
-        scaleAnimation.setInterpolator(Interpolator.EASE_BOTH);
-
-
-        // 2. Détermination des couleurs
-        boolean activating = target > 1.0;
-
-        Color transparent = Color.web("#7040B6", 0.0);
-        Color purple = Color.web("#7040B6", 1.0);
-
-        Color startColor = activating ? transparent : purple;
-        Color endColor = activating ? purple : transparent;
-
-
-        // 3. Progression de l'animation
-        DoubleProperty progress = new SimpleDoubleProperty(0);
-
-        progress.addListener((observable, oldValue, newValue) -> {
-
-            Color color = startColor.interpolate(
-                    endColor,
-                    newValue.doubleValue()
-            );
-
-            // Reconstruction du fond avec la nouvelle couleur
-            BackgroundFill fill = new BackgroundFill(
-                    color,
-                    new CornerRadii(btn.getFont().getSize() * 0.7),
-                    Insets.EMPTY
-            );
-
-            Background background = new Background(fill);
-
-            btn.setBackground(background);
-        });
-
-
-        // 4. Animation de la progression de 0 à 1
-        Timeline colorAnimation = new Timeline(
-                new KeyFrame(
-                        duration,
-                        new KeyValue(
-                                progress,
-                                1.0,
-                                Interpolator.EASE_BOTH
-                        )
-                )
-        );
-
-
-        // 5. Lancement simultané des deux animations
-        ParallelTransition transition = new ParallelTransition(
-                scaleAnimation,
-                colorAnimation
-        );
-
-        transition.play();
-    }
 }
