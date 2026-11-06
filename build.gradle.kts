@@ -1,3 +1,5 @@
+import java.nio.file.Files
+
 plugins {
     id("java")
     id("application")
@@ -40,6 +42,21 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    // CI Windows TEMP may use a junction or an 8.3 alias. Fixtures need a
+    // canonical physical root; production path/link checks remain unchanged.
+    val fixtureTemp = layout.buildDirectory.dir("test-tmp")
+    doFirst {
+        val directory = fixtureTemp.get().asFile.toPath()
+        Files.createDirectories(directory)
+        systemProperty("java.io.tmpdir", directory.toRealPath().toString())
+    }
+    inputs.property("windowsSmoke", providers.environmentVariable("COOKIE_CORE_WINDOWS_SMOKE").orElse("false"))
+    testLogging {
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        showExceptions = true
+        showCauses = true
+        showStackTraces = true
+    }
 }
 val releaseVersion = project.version.toString()
 require(Regex("(0|[1-9][0-9]{0,8})\\.(0|[1-9][0-9]{0,8})\\.(0|[1-9][0-9]{0,8})").matches(releaseVersion))

@@ -71,6 +71,18 @@ jobs:
             build/windows-smoke-evidence.txt
             build/verification/full-suite/*.xml
           if-no-files-found: error
+      - name: Upload test diagnostics even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-test-diagnostics
+          path: |
+            build/test-results/test/
+            build/reports/tests/test/
+            build/verification/
+            build/windows-smoke-evidence.txt
+          if-no-files-found: warn
+          retention-days: 14
   publish:
     if: github.event_name == 'workflow_dispatch' && inputs.publish
     needs: build
