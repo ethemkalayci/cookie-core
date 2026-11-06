@@ -1,0 +1,112 @@
+name: Windows distribution
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing stable tag, e.g. v1.0.1'
+        required: true
+        type: string
+      publish:
+        description: 'Publish after protected release environment approval'
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: windows-release-${{ github.event.inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref_name }}
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Validate version and embed public trust anchors
+        shell: pwsh
+        env:
+          RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
+          PUBLIC_KEYS: ${{ vars.COOKIE_CORE_UPDATE_KEYS }}
+        run: |
+          if ($env:RELEASE_TAG -notmatch '^v((0|[1-9][0-9]{0,8})\.(0|[1-9][0-9]{0,8})\.(0|[1-9][0-9]{0,8}))$') { throw 'Invalid stable tag' }
+          $version=$Matches[1]
+          if (-not $env:PUBLIC_KEYS) { throw 'Configure public COOKIE_CORE_UPDATE_KEYS repository variable' }
+          Set-Content -Encoding ascii -LiteralPath src/main/resources/update-keys.properties -Value $env:PUBLIC_KEYS
+          "RELEASE_VERSION=$version" >> $env:GITHUB_ENV
+      - name: Tests and package
+        shell: pwsh
+        run: |
+          ./gradlew.bat test packageWindows "-PreleaseVersion=$env:RELEASE_VERSION" --no-daemon
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Preserve full suite reports
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force build/verification | Out-Null
+          Copy-Item build/test-results/test build/verification/full-suite -Recurse
+      - name: Reproducible Windows 1.0.0 to 1.0.1 and rollback
+        shell: pwsh
+        run: |
+          foreach ($v in @('1.0.0','1.0.1')) {
+            if ($v -ne $env:RELEASE_VERSION) {
+              ./gradlew.bat packageWindows "-PreleaseVersion=$v" --no-daemon
+              if ($LASTEXITCODE) { exit $LASTEXITCODE }
+            }
+          }
+          $env:COOKIE_CORE_WINDOWS_SMOKE='true'
+          ./gradlew.bat test --tests '*WindowsUpdateSmokeTest' "-PreleaseVersion=$env:RELEASE_VERSION" --no-daemon
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-distribution
+          path: |
+            build/windows-${{ env.RELEASE_VERSION }}/*.zip
+            build/test-results/test/*.xml
+            build/windows-smoke-evidence.txt
+            build/verification/full-suite/*.xml
+          if-no-files-found: error
+  publish:
+    if: github.event_name == 'workflow_dispatch' && inputs.publish
+    needs: build
+    runs-on: windows-latest
+    environment: release
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-distribution
+          path: artifacts
+      - name: Sign and publish stable release
+        shell: pwsh
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+          COOKIE_CORE_SIGNING_KEY: ${{ secrets.COOKIE_CORE_SIGNING_KEY }}
+          COOKIE_CORE_UPDATE_KEYS: ${{ vars.COOKIE_CORE_UPDATE_KEYS }}
+          KEY_ID: ${{ vars.COOKIE_CORE_KEY_ID }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ($env:RELEASE_TAG -notmatch '^v((0|[1-9][0-9]{0,8})\.(0|[1-9][0-9]{0,8})\.(0|[1-9][0-9]{0,8}))$') { throw 'Invalid tag' }
+          $version=$Matches[1]
+          $archive=@(Get-ChildItem artifacts -Recurse -Filter "CookieCore-$version-windows-x64.zip")
+          $setup=@(Get-ChildItem artifacts -Recurse -Filter "CookieCore-$version-setup.zip")
+          if ($archive.Count -ne 1 -or $setup.Count -ne 1) { throw 'Ambiguous artifacts' }
+          java tools/update/SignRelease.java $version $archive[0].FullName signed $env:KEY_ID
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          gh release create $env:RELEASE_TAG $archive[0].FullName $setup[0].FullName signed/release.json signed/release.sig --verify-tag --title "Cookie Core $version" --notes "Windows x64, Java 25 inclus." --latest
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+
+

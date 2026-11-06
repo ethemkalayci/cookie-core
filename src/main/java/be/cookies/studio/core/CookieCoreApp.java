@@ -114,6 +114,7 @@ public class CookieCoreApp extends Application {
             stage.setMaximized(true);
             stage.setScene(scene);
             stage.show();
+            be.cookies.studio.core.update.UpdateUi.attach((javafx.scene.layout.BorderPane) root);
 
         } catch (Exception e) {
             throw new RuntimeException(
