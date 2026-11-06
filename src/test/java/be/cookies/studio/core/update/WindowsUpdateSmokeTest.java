@@ -38,9 +38,12 @@ class WindowsUpdateSmokeTest {
         patchTrust(one.resolve("app/cookie-core.jar"),trust);patchTrust(two.resolve("app/cookie-core.jar"),trust);
         copy(one.resolve("runtime"),root.resolve("bootstrap/runtime"));copy(one.resolve("app"),root.resolve("bootstrap/app"));
         Path zip=temp.resolve("candidate.zip");
-        try(var out=new ZipOutputStream(Files.newOutputStream(zip));var paths=Files.walk(two)){
-            for(Path p:paths.filter(Files::isRegularFile).toList()) {out.putNextEntry(new ZipEntry(two.relativize(p).toString().replace('\\','/')));Files.copy(p,out);out.closeEntry();}
-        }
+        var packager=new ProcessBuilder("powershell.exe","-NoProfile","-ExecutionPolicy","Bypass","-File",
+            Path.of("tools/update/Create-ReleaseArchive.ps1").toAbsolutePath().toString(),"-Source",two.toString(),
+            "-Destination",zip.toString(),"-Jdk",System.getProperty("java.home"))
+            .redirectErrorStream(true).redirectOutput(temp.resolve("packager.log").toFile()).start();
+        if(!packager.waitFor(60,java.util.concurrent.TimeUnit.SECONDS)){packager.destroyForcibly();fail("Production packager timed out");}
+        assertEquals(0,packager.exitValue(),"Production packager must succeed");
         var digest=MessageDigest.getInstance("SHA-256");try(var in=Files.newInputStream(zip)){byte[] b=new byte[65536];for(int n;(n=in.read(b))!=-1;)digest.update(b,0,n);}
         String json=new String(UpdateSecurityTest.manifest("1.0.1","windows-x64"),java.nio.charset.StandardCharsets.UTF_8).replace("\"test\"","\"ephemeral-test\"").replace("\"size\":1,","\"size\":"+Files.size(zip)+",").replace("0".repeat(64),HexFormat.of().formatHex(digest.digest()));
         byte[] bytes=json.getBytes(java.nio.charset.StandardCharsets.UTF_8);var signer=Signature.getInstance("Ed25519");signer.initSign(pair.getPrivate());signer.update(bytes);byte[] signature=Base64.getEncoder().encode(signer.sign());

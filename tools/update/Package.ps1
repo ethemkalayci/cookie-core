@@ -12,8 +12,7 @@ if($LASTEXITCODE){throw 'jpackage failed'}
 Set-Content -Encoding ascii -NoNewline -LiteralPath "$out\image\CookieCore\app\version.txt" -Value $Version
 $bundle="$out\installer"
 New-Item -ItemType Directory -Path "$bundle\payload" -Force | Out-Null
-Add-Type -AssemblyName System.IO.Compression.FileSystem
-[IO.Compression.ZipFile]::CreateFromDirectory("$out\image\CookieCore","$out\CookieCore-$Version-windows-x64.zip")
+& "$PSScriptRoot\Create-ReleaseArchive.ps1" -Source "$out\image\CookieCore" -Destination "$out\CookieCore-$Version-windows-x64.zip" -Jdk $Jdk
 Copy-Item "$out\image\CookieCore\*" "$bundle\payload" -Recurse
 Copy-Item tools/update/Install.ps1,tools/update/Launch.vbs $bundle
 Compress-Archive -Path "$bundle\*" -DestinationPath "$out\CookieCore-$Version-setup.zip"

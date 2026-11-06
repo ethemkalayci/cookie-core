@@ -20,7 +20,11 @@ class SignRelease {
                 String publicValue=publicKeys.getProperty(id);if(publicValue==null)throw new IllegalStateException("Public key id missing");
         try(var zip=new java.util.zip.ZipFile(archive.toFile())) {
             var embedded=new Properties();boolean foundVersion=false;
-            try(var jar=new java.util.jar.JarInputStream(zip.getInputStream(zip.getEntry("app/cookie-core.jar")))) {
+                        if(zip.stream().anyMatch(entry->entry.getName().contains("\\")))
+                throw new SecurityException("Non-portable ZIP paths: rebuild using Create-ReleaseArchive.ps1");
+            var appJar=zip.getEntry("app/cookie-core.jar");
+            if(appJar==null || appJar.isDirectory())throw new SecurityException("Invalid release ZIP: app/cookie-core.jar missing");
+            try(var jar=new java.util.jar.JarInputStream(zip.getInputStream(appJar))) {
                 for(java.util.jar.JarEntry entry;(entry=jar.getNextJarEntry())!=null;) {
                     if(entry.getName().equals("update-keys.properties"))embedded.load(new java.io.ByteArrayInputStream(jar.readAllBytes()));
                     if(entry.getName().equals("version.txt")) {foundVersion=true;if(!new String(jar.readAllBytes(),java.nio.charset.StandardCharsets.UTF_8).trim().equals(version))throw new SecurityException("Embedded version mismatch");}
