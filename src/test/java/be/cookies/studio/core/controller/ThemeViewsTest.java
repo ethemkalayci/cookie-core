@@ -34,9 +34,29 @@ class ThemeViewsTest {
    }
   }ThemeService.preview(Theme.AMETHYSTE.colors());return null;
  });}
+ @Test void reducedTransparencyMakesNewsAndContentsOpaque() throws Exception {fx(()->{
+  var news=new VBox();news.getStyleClass().add("home-news");
+  Region card=new FXMLLoader(getClass().getResource("/view/newsCard.fxml")).load();news.getChildren().add(card);
+  var l=loader("instance");Parent instance=l.load();
+  var shade=new Region();shade.getStyleClass().add("world-shade");
+  var root=new VBox(shade,news,instance);ThemeService.attach(new Scene(root,1280,900));
+  var opaque=javafx.css.PseudoClass.getPseudoClass("opaque");
+  root.pseudoClassStateChanged(opaque,false);root.applyCss();root.layout();
+  Region contents=(Region)instance.lookup(".instance-customization");
+  var normalShade=shade.getBackground();
+  for(var region:List.of(card,contents))assertTrue(((Color)region.getBackground().getFills().getFirst().getFill()).getOpacity()<1);
+  root.pseudoClassStateChanged(opaque,true);root.applyCss();root.layout();
+  assertEquals(normalShade,shade.getBackground(),"L’illustration ne doit pas être assombrie par l’option");
+  for(var region:List.of(card,contents))assertEquals(1,((Color)region.getBackground().getFills().getFirst().getFill()).getOpacity(),.001);
+  root.pseudoClassStateChanged(opaque,false);root.applyCss();
+  assertTrue(((Color)contents.getBackground().getFills().getFirst().getFill()).getOpacity()<1);
+  return null;
+ });}
  @Test void expandedPaletteScrollsToLastColor() throws Exception {fx(()->{
   var l=loader("settings");Parent view=l.load();ThemeService.attach(new Scene(view,1000,720));
-  var pane=(TitledPane)l.getNamespace().get("palettePane");pane.setExpanded(true);
+  var pane=(TitledPane)l.getNamespace().get("palettePane");
+  assertTrue(pane.isExpanded(),"Couleurs visibles dès l’ouverture");
+  assertFalse(pane.isCollapsible(),"La palette ne se masque pas derrière un volet");
   view.applyCss();view.layout();view.layout();
   var scroll=(ScrollPane)l.getNamespace().get("paletteScroll");
   assertTrue(scroll.getContent().getLayoutBounds().getHeight()>scroll.getViewportBounds().getHeight());

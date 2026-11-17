@@ -26,12 +26,16 @@ public class SettingsController {
     @FXML private ComboBox<MemorySettings.Target> memoryTarget;
     @FXML private Button deleteTheme;
     @FXML private VBox settingsContent;
+    @FXML private javafx.scene.image.ImageView backgroundPreview;
+    @FXML private Label backgroundStatus;
+    private long backgroundPreviewRequest;
     private final EnumMap<ThemeColor,String> draft=new EnumMap<>(ThemeColor.class);
     private boolean loading, editing, disposed;
     private String editingId;
     private Theme base=Theme.AMETHYSTE;
     @FXML private void initialize(){
         be.cookies.studio.core.ui.ViewSupport.collapseWhenEmpty(status);
+        refreshBackground();
         loading=true;
         baseTheme.getItems().setAll(Theme.values());
         ramSlider.setMin(1);ramSlider.setMax(MemorySettings.maxMiB()/1024.0);ramSlider.setBlockIncrement(.25);
@@ -49,6 +53,29 @@ public class SettingsController {
         themes.setOnAction(e->{if(!loading&&themes.getValue()!=null)selectTheme();});
         baseTheme.setOnAction(e->{if(!loading){base=baseTheme.getValue();draft.clear();draft.putAll(base.colors());editingId=null;deleteTheme.setDisable(true);themeName.clear();editing=true;buildRows();preview();}});
         status.setText(settings.warning());loading=false;loadMemoryTargets();
+    }
+    private void refreshBackground(){
+        long request=++backgroundPreviewRequest;
+        String path=settings.current().backgroundImage();
+        backgroundStatus.setText(path.isBlank()?"Image Cookie Core":"Image personnelle enregistrée");
+        ArtworkService.load(path.isBlank()?ArtworkService.FALLBACK:path).thenAccept(image->javafx.application.Platform.runLater(()->{
+            if(!disposed&&request==backgroundPreviewRequest)backgroundPreview.setImage(image);
+        }));
+    }
+    private void backgroundChanged(){
+        refreshBackground();
+        if(settingsContent.getScene().getRoot() instanceof be.cookies.studio.core.ui.ImmersiveShell shell)
+            shell.showArtwork(null);
+        status.setText("Arrière-plan enregistré.");
+    }
+    @FXML private void chooseBackground(){
+        var chooser=new javafx.stage.FileChooser();chooser.setTitle("Arrière-plan Cookie Core");
+        chooser.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("Images PNG et JPEG","*.png","*.jpg","*.jpeg"));
+        var file=chooser.showOpenDialog(settingsContent.getScene().getWindow());
+        if(file!=null)work(()->{BackgroundService.choose(settings,file.toPath());return null;},this::backgroundChanged,false);
+    }
+    @FXML private void resetBackground(){
+        work(()->{BackgroundService.reset(settings);return null;},this::backgroundChanged,false);
     }
     private void saveAccessibility(){
         boolean motion=reducedMotion.isSelected(), transparency=reducedTransparency.isSelected();

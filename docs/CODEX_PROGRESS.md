@@ -129,3 +129,20 @@ Image Downloads/testBg.png copiée sans transformation dans les ressources : ima
 ### Mise en page adaptative et ajustement demandé — 17 novembre 2026
 Pages neutres centrées avec largeur de lecture limitée ; gestion locale et création utilisent un hôte centré réutilisable. Création redimensionnable avec minimum réduit. Accueil et instances : partie supérieure sur toute la largeur disponible, texte à gauche, cloche/flèches à droite ; actualités et contenus inférieurs restent centrés (1368 px maximum). Suppression du statut redondant « Prête à jouer », conservation des erreurs et messages de lancement. Palette développée : hauteur utile 480 px, contenu non compressible, explication raccourcie et multilignes.
 Validation : suite complète passée après centrage initial ; tests ImmersiveVisualTest, ThemeViewsTest et HomeViewTest repassés après ajustement. Rendus FXML hors réseau à 760×480, 1280×720, 1920×1080 et 3440×1440 ; captures accueil et palette examinées. Pas de lancement Minecraft ni modification de données joueur.
+
+### Palette visible par défaut — 17 novembre 2026
+Le volet Couleurs du thème est désormais ouvert et non repliable. Test de l'état initial et du défilement jusqu'à la dernière couleur : ThemeViewsTest passé via Gradle Wrapper. Aucun changement des préférences enregistrées.
+
+### Cartes et réduction de transparence — 17 novembre 2026
+Cartes d’actualités : matériau teinté, contour fin, espacement et titres renforcés. Panneau des contenus harmonisé. Correction des sélecteurs .opaque en .root:opaque pour correspondre à ThemeService ; surfaces, cartes, palette et contrôles deviennent opaques. Tests ThemeViewsTest, HomeViewTest et ImmersiveShellTest réussis, dont passage transparent/opaque/transparent sur les vrais composants FXML. Pas de vérification visuelle interactive sur cette étape.
+
+### Transparence des cartes et illustration — 17 novembre 2026
+Suppression du voile noir supplémentaire en mode réduction de transparence. L’illustration conserve le même voile dans les deux modes. Opacité des cartes news et du panneau contenus abaissée de 78 à 52 % en mode normal, surfaces solides conservées avec l’option activée. ThemeViewsTest passé, avec assertion de stabilité du fond lors de la bascule.
+
+### Faux blocage par les JVM — 17 novembre 2026
+InstanceOperationLock ne bloque plus toutes les applications Java identifiables : détection des points d’entrée Minecraft, Prism/MultiMC, Fabric, Quilt, Forge/NeoForge et --gameDir. Protection conservée pour Prism et les JVM dont les arguments sont illisibles. Tests dédiés et InstanceLifecycleTest exécutés. Aucun déplacement de données personnelles effectué.
+
+### Fond personnel — 17 novembre 2026
+Paramètres / Apparence : choix PNG/JPEG (30 Mo max), aperçu, application immédiate et restauration du fond intégré. Copie privée dans backgrounds, validation et décodage hors thread UI ; préférence facultative compatible settings v1, conservée lors des modifications de thème, mémoire et accessibilité. Fonds contextuels inchangés ; recours au fond intégré si la copie devient illisible. Compilation et tests paramètres/présentation réussis ; test import, indépendance du fichier original, persistance, image invalide et restauration. Sélecteur de fichiers non testé manuellement.
+
+Vérification avant push : suite complète réussie (104 tests, 2 ignorés). Correction du défilement de la cloche vers les actualités en tenant compte des nouveaux conteneurs centrés.

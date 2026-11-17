@@ -14,6 +14,10 @@ public final class ArtworkService {
     private static final Map<String, CompletableFuture<Image>> PENDING = new HashMap<>();
     private ArtworkService() {}
     public static synchronized CompletableFuture<Image> load(String source) {
+        if(source==null || source.isBlank()) {
+            String custom=SettingsService.get().current().backgroundImage();
+            if(!custom.isBlank())return load(custom).thenCompose(image -> image==null?load(FALLBACK):CompletableFuture.completedFuture(image));
+        }
         String key = source == null || source.isBlank() ? FALLBACK : source;
         if (CACHE.containsKey(key)) return CompletableFuture.completedFuture(CACHE.get(key));
         if (PENDING.containsKey(key)) return PENDING.get(key);

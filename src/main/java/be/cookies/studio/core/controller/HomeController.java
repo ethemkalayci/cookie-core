@@ -173,7 +173,7 @@ public class HomeController {
         newsButton.setGraphic(loadIcon("notification.svg"));
         newsButton.setOnAction(event -> {
             double available = ((Region) homeScrollPane.getContent()).getHeight() - homeScrollPane.getViewportBounds().getHeight();
-            if (available > 0) homeScrollPane.setVvalue(Math.min(1, newsSection.getBoundsInParent().getMinY() / available));
+            if (available > 0) homeScrollPane.setVvalue(Math.min(1, homeScrollPane.getContent().sceneToLocal(newsSection.localToScene(newsSection.getBoundsInLocal())).getMinY() / available));
         });
         lastInstanceName.maxWidthProperty().bind(javafx.beans.binding.Bindings.min(552, bannerPane.widthProperty().subtract(96)));
         lastInstanceVersions.maxWidthProperty().bind(javafx.beans.binding.Bindings.min(552, bannerPane.widthProperty().subtract(96)));

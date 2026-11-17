@@ -231,8 +231,8 @@
 .menu-item:focused { -fx-background-color: #353D49; }
 .hyperlink { -fx-text-fill: #CDD9EE; -fx-underline: true; }
 .operation-footer { -fx-background-color: #191C22; -fx-border-color: #454C59; -fx-border-width: 1 0 0 0; }
-.opaque .glass-tint, .opaque .hero-toolbar { -fx-background-color: #191C22; }
-.opaque .world-shade { -fx-background-color: rgba(10,12,16,.88); }
+.root:opaque .glass-tint, .root:opaque .hero-toolbar { -fx-background-color: #191C22; }
+/* Réduire la transparence ne modifie pas le voile de l’illustration. */
 .app-shell:compact .page { -fx-padding: 20 24; }
 .app-shell:compact .home-instance-title, .app-shell:compact .instance-title { -fx-font-size: 34px; }
 .app-shell:short .sidebar .nav-button { -fx-min-height: 36; -fx-pref-height: 36; }
@@ -262,7 +262,7 @@
 .color-row { -fx-background-color: rgba(255,255,255,.04); }
 .titled-pane > .title { -fx-background-color: rgba(255,255,255,.06); }
 .titled-pane > .content { -fx-background-color: rgba(16,20,28,.22); -fx-border-color: rgba(255,255,255,.12); }
-.opaque .surface-card, .opaque .glass-tint, .opaque .hero-toolbar, .opaque .settings-page > .tab-pane { -fx-background-color: -cc-material-solid; }
+.root:opaque .surface-card, .root:opaque .glass-tint, .root:opaque .hero-toolbar, .root:opaque .settings-page > .tab-pane { -fx-background-color: -cc-material-solid; }
 
 .settings-page > .tab-pane { -fx-border-radius: 16; }
 
@@ -272,7 +272,7 @@
 .home-news .news-card-content { -fx-padding: 18 0 0 0; }
 .home-news .news-card-description { -fx-text-fill: #E0E4EB; -fx-font-size: 14px; }
 .home-news .news-card { -fx-border-width: 0; }
-.instance-launch-actions, .opaque .instance-launch-actions { -fx-background-color: transparent; -fx-border-color: transparent; -fx-effect: null; -fx-padding: 12 24; }
+.instance-launch-actions, .root:opaque .instance-launch-actions { -fx-background-color: transparent; -fx-border-color: transparent; -fx-effect: null; -fx-padding: 12 24; }
 .instance-customization { -fx-padding: 24; -fx-background-color: rgba(20,24,32,.32); -fx-background-radius: 16; }
 .instance-customization .content-tabs { -fx-padding: 0 0 12 0; -fx-border-color: transparent transparent rgba(255,255,255,.15) transparent; }
 .instance-customization .content-tabs .button { -fx-background-color: transparent; -fx-padding: 10 20; -fx-font-size: 15px; }
@@ -282,4 +282,37 @@
 .instance-customization .content-list { -fx-border-color: transparent; -fx-padding: 0; }
 .instance-customization .content-row .secondary-button { -fx-background-color: transparent; }
 .instance-customization .content-row .button:hover { -fx-background-color: rgba(255,255,255,.12); }
-.opaque .instance-customization { -fx-background-color: -cc-material-solid; }
+.root:opaque .instance-customization { -fx-background-color: -cc-material-solid; }
+
+/* Cartes éditoriales : image ouverte, corps lisible et pied de carte aligné. */
+.home-news .news-card, .home-news .news-card:hover {
+    -fx-background-color: -cc-wash;
+    -fx-border-color: rgba(255,255,255,.16);
+    -fx-border-width: 1;
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+}
+.home-news .news-card:hover { -fx-border-color: -cc-selection; }
+.home-news .news-card-content { -fx-padding: 20; -fx-spacing: 14; }
+.home-news .news-card-category {
+    -fx-font-size: 12px;
+    -fx-text-fill: -cc-text-muted;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+}
+.home-news .news-card-title { -fx-font-size: 20px; }
+.home-news .news-card-view-button { -fx-font-size: 13px; -fx-padding: 8 16; }
+.instance-customization {
+    -fx-background-color: -cc-wash;
+    -fx-border-color: rgba(255,255,255,.16);
+    -fx-border-width: 1;
+    -fx-border-radius: 16;
+}
+/* L'état est une pseudo-classe JavaFX, propagée par ThemeService. */
+.root:opaque .home-news .news-card,
+.root:opaque .home-news .news-card:hover,
+.root:opaque .instance-customization,
+.root:opaque .titled-pane > .content,
+.root:opaque .titled-pane > .title { -fx-background-color: -cc-material-solid; }
+.root:opaque .text-field, .root:opaque .combo-box, .root:opaque .color-picker,
+.root:opaque .content-tools .button { -fx-background-color: -cc-panel; }

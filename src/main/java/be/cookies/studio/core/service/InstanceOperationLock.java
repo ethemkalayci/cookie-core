@@ -18,12 +18,28 @@ final class InstanceOperationLock implements AutoCloseable {
             if(process.pid()==ProcessHandle.current().pid())continue;
             var info=process.info();String command=info.command().orElse("").toLowerCase(Locale.ROOT);
             if(command.endsWith("prismlauncher.exe")||command.endsWith("/prismlauncher"))throw new IOException("Ferme Prism et Minecraft avant de modifier les fichiers, puis réessaie.");
-            if(command.endsWith("java.exe")||command.endsWith("javaw.exe")||command.endsWith("/java")){
-                String args=String.join(" ",info.arguments().orElse(new String[0]));
-                if(args.contains("GradleDaemon")||args.contains("GradleWorkerMain")||args.contains("GradleWrapperMain")||args.contains("org.jetbrains")||args.contains("com.intellij"))continue;
-                throw new IOException("Un autre processus Java est actif : Minecraft pourrait utiliser cette instance. Ferme le jeu (et les autres applications Java si nécessaire), puis réessaie.");
-            }
+            if(isMinecraftJava(command,info.arguments().orElse(new String[0])))
+                throw new IOException(info.arguments().orElse(new String[0]).length==0
+                    ? "Un processus Java ne peut pas être identifié. Ferme le jeu et les applications Java non nécessaires, puis réessaie."
+                    : "Minecraft est actif. Ferme le jeu avant de modifier les instances, puis réessaie.");
+
         }
+    }
+    /** Classify the launch target, not every JVM (IDE, Gradle and tools also use Java). */
+    static boolean isMinecraftJava(String command,String[] arguments) {
+        String executable=command.replace('\\','/').toLowerCase(Locale.ROOT);
+        if(!(executable.endsWith("/java.exe")||executable.endsWith("/javaw.exe")||executable.endsWith("/java")))return false;
+        // An unreadable JVM command line cannot safely be classified as unrelated.
+        if(arguments.length==0)return true;
+        for(String argument:arguments) {
+            String value=argument.toLowerCase(Locale.ROOT);
+            if(value.equals("org.prismlauncher.entrypoint")||value.equals("org.multimc.entrypoint")
+                    ||value.startsWith("net.minecraft.")||value.startsWith("net.fabricmc.loader.")
+                    ||value.startsWith("org.quiltmc.loader.")||value.startsWith("cpw.mods.modlauncher.")
+                    ||value.startsWith("cpw.mods.bootstraplauncher.")||value.startsWith("net.minecraftforge.bootstrap.")
+                    ||value.startsWith("net.neoforged.bootstrap.")||value.equals("--gamedir"))return true;
+        }
+        return false;
     }
     public void close() throws IOException {try{lock.release();}finally{channel.close();}}
 }

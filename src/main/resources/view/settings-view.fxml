@@ -2,6 +2,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.image.ImageView?>
 <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="home-scroll" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="be.cookies.studio.core.controller.SettingsController">
 <content><StackPane alignment="TOP_CENTER" minWidth="0"><VBox fx:id="settingsContent" spacing="22" styleClass="page,settings-page" maxWidth="1100" minWidth="0" maxHeight="-Infinity">
 <VBox spacing="6"><Label text="À TA FAÇON" styleClass="eyebrow"/>
@@ -15,6 +16,12 @@
 <CheckBox fx:id="reducedMotion" text="Réduire les animations"/>
 <CheckBox fx:id="reducedTransparency" text="Réduire la transparence"/>
 <Separator/>
+<Label text="Arrière-plan par défaut" styleClass="settings-heading"/>
+<Label text="Pour les pages neutres et l’accueil sans historique. Les instances gardent leur propre illustration." wrapText="true" minHeight="-Infinity" styleClass="muted"/>
+<ImageView fx:id="backgroundPreview" fitWidth="280" fitHeight="150" preserveRatio="true" smooth="true"/>
+<Label fx:id="backgroundStatus" wrapText="true" minHeight="-Infinity" styleClass="muted"/>
+<FlowPane hgap="12" vgap="12"><Button text="Choisir une image…" onAction="#chooseBackground"/><Button text="Rétablir le fond par défaut" onAction="#resetBackground"/></FlowPane>
+<Separator/>
 <Label text="Thème actif" styleClass="settings-heading"/>
 <ComboBox fx:id="themes" prefWidth="340"/>
 <Label text="Les accents sont appliqués immédiatement et conservés au redémarrage. Le verre dépoli reprend une teinte discrète du thème pour garder des textes lisibles." wrapText="true" styleClass="muted"/>
@@ -24,7 +31,7 @@
 <FlowPane hgap="14" vgap="12"><Label text="Palette de base"/><ComboBox fx:id="baseTheme" prefWidth="180"/><TextField fx:id="themeName" promptText="Nom de ton thème" prefWidth="230"/></FlowPane>
 <Label fx:id="contrastWarning" wrapText="true" styleClass="warning"/>
 <FlowPane hgap="12" vgap="12"><Button wrapText="true" text="Enregistrer le thème" onAction="#saveTheme"/><Button wrapText="true" styleClass="secondary-button" text="Annuler l'aperçu" onAction="#cancelPreview"/><Button wrapText="true" styleClass="secondary-button" text="Réinitialiser toutes les couleurs" onAction="#resetAll"/><Button wrapText="true" styleClass="secondary-button" fx:id="deleteTheme" text="Supprimer le thème personnel" onAction="#deleteTheme"/></FlowPane>
-<TitledPane minHeight="-Infinity" fx:id="palettePane" text="Palette complète et couleurs conservées" expanded="false" animated="false"><content><VBox spacing="16" minHeight="-Infinity"><Label minHeight="-Infinity" text="Modifie une couleur avec le sélecteur ou son code hexadécimal. Les couleurs historiques restent conservées." wrapText="true" styleClass="muted"/><ScrollPane fx:id="paletteScroll" fitToWidth="true" prefHeight="480" minHeight="480" maxHeight="480" hbarPolicy="NEVER" styleClass="palette-scroll"><content><VBox fx:id="colorRows" spacing="10" minHeight="-Infinity"/></content></ScrollPane></VBox></content></TitledPane>
+<TitledPane minHeight="-Infinity" fx:id="palettePane" text="Couleurs du thème" expanded="true" collapsible="false" animated="false"><content><VBox spacing="16" minHeight="-Infinity"><Label minHeight="-Infinity" text="Modifie une couleur avec le sélecteur ou son code hexadécimal. Les couleurs historiques restent conservées." wrapText="true" styleClass="muted"/><ScrollPane fx:id="paletteScroll" fitToWidth="true" prefHeight="480" minHeight="480" maxHeight="480" hbarPolicy="NEVER" styleClass="palette-scroll"><content><VBox fx:id="colorRows" spacing="10" minHeight="-Infinity"/></content></ScrollPane></VBox></content></TitledPane>
 </VBox></content></Tab>
 <Tab text="Minecraft et stockage"><content><VBox spacing="20">
 <padding><Insets top="24" right="12" bottom="24" left="12"/></padding>

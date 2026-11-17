@@ -47,6 +47,26 @@ class ImmersiveShellTest {
         }
         for(String color:List.of("#FFFFFF","#000000","#FFFF00","#FF00FF","#777777"))assertTrue(ThemeService.contrast(color,ThemeService.foreground(color))>=4.5);
     }
+    @Test void personalBackgroundIsCopiedPersistedAndCanBeReset()throws Exception {
+        fx(()->null);
+        var settings=new SettingsService(temp);
+        var source=temp.resolve("original.png");
+        try(var input=getClass().getResourceAsStream("/images/banners/default-background.png")) {
+            java.nio.file.Files.copy(input,source);
+        }
+        BackgroundService.choose(settings,source);
+        String saved=settings.current().backgroundImage();
+        assertFalse(saved.isBlank());
+        java.nio.file.Files.delete(source);
+        assertTrue(java.nio.file.Files.isRegularFile(Path.of(java.net.URI.create(saved))));
+        settings.update(c->c.accessibility(true,true).minecraft(0,"").appearance("NEON",c.customThemes()));
+        assertEquals(saved,new SettingsService(temp).current().backgroundImage());
+        var invalid=temp.resolve("broken.png");java.nio.file.Files.writeString(invalid,"not an image");
+        assertThrows(Exception.class,()->BackgroundService.choose(settings,invalid));
+        assertEquals(saved,settings.current().backgroundImage());
+        BackgroundService.reset(settings);
+        assertEquals("",new SettingsService(temp).current().backgroundImage());
+    }
     @Test void decoderBoundsImagesAndReusesSuccessfulLoads()throws Exception{
         var image=ArtworkService.load(null).get(10,TimeUnit.SECONDS);assertNotNull(image);assertTrue(image.getWidth()<=1920 && image.getHeight()<=1080);assertSame(image,ArtworkService.load(null).get());
         assertNull(ArtworkService.load(temp.resolve("missing.png").toUri().toString()).get(10,TimeUnit.SECONDS));
