@@ -6,19 +6,18 @@ import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.*;
 import javafx.scene.layout.*;
 import javafx.stage.*;
 import java.util.List;
 
-/** Fixed, owner-modal creation form. Version discovery stays on worker threads. */
+/** Resizable, owner-modal creation form. Version discovery stays on worker threads. */
 final class InstanceCreationDialog extends Dialog<InstanceCreationDialog.Selection> {
     record Selection(String name,String minecraft,ModLoader loader,String version){}
     @FunctionalInterface interface Versions {List<String> load(String minecraft,ModLoader loader)throws Exception;}
     private int generation;
     InstanceCreationDialog(Window owner,List<String> minecraftVersions,Versions versions){
-        initOwner(owner);initModality(Modality.WINDOW_MODAL);initStyle(StageStyle.UNDECORATED);setResizable(false);setTitle("Créer une instance");
+        initOwner(owner);initModality(Modality.WINDOW_MODAL);initStyle(StageStyle.DECORATED);setResizable(true);setTitle("Créer une instance");
         var pane=getDialogPane();pane.getStyleClass().add("instance-creation-dialog");
         var createType=new ButtonType("Créer",ButtonBar.ButtonData.OK_DONE);pane.getButtonTypes().addAll(ButtonType.CANCEL,createType);
         ((Button)pane.lookupButton(ButtonType.CANCEL)).setText("Annuler");var create=(Button)pane.lookupButton(createType);create.setDisable(true);
@@ -40,7 +39,7 @@ final class InstanceCreationDialog extends Dialog<InstanceCreationDialog.Selecti
         var hint=new Label("Vanilla : Minecraft sans modloader. Le jeu sera préparé au premier lancement.");hint.setWrapText(true);hint.getStyleClass().add("muted");
         var retry=new Button("Réessayer");retry.setVisible(false);retry.setManaged(false);
         var content=new VBox(24,header,profile,new VBox(10,new Label("Version Minecraft"),minecraft),new VBox(12,new Label("Modloader"),loaders),loaderVersionBox,hint,retry);content.setPadding(new Insets(24));
-        var scroll=new ScrollPane(content);scroll.setFitToWidth(true);scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);pane.setContent(scroll);
+        var scroll=new ScrollPane(be.cookies.studio.core.ui.ViewSupport.centered(content,720));scroll.setFitToWidth(true);scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);pane.setContent(scroll);
         Runnable validate=()->create.setDisable(name.getText().strip().isEmpty()||name.getText().strip().length()>100||name.getText().chars().anyMatch(Character::isISOControl)||minecraft.getValue()==null||loaderVersion.getValue()==null);
         Runnable fetch=()->{
             int request=++generation;ModLoader loader=(ModLoader)group.getSelectedToggle().getUserData();String mc=minecraft.getValue();retry.setVisible(false);retry.setManaged(false);loaderVersion.getItems().clear();loaderVersion.setValue(null);loaderVersion.setDisable(true);validate.run();
@@ -57,10 +56,10 @@ final class InstanceCreationDialog extends Dialog<InstanceCreationDialog.Selecti
         setResultConverter(button->button==createType?new Selection(name.getText().strip(),minecraft.getValue(),(ModLoader)group.getSelectedToggle().getUserData(),loaderVersion.getValue()):null);
         ThemeService.attach(this);
         var bounds=Screen.getScreensForRectangle(owner.getX(),owner.getY(),Math.max(1,owner.getWidth()),Math.max(1,owner.getHeight())).stream().findFirst().orElse(Screen.getPrimary()).getVisualBounds();
-        double width=Math.min(560,bounds.getWidth()-32),height=Math.min(650,bounds.getHeight()-48);
-        pane.setMinSize(width,height);pane.setPrefSize(width,height);pane.setMaxSize(width,height);
+        double width=Math.min(640,bounds.getWidth()-32),height=Math.min(650,bounds.getHeight()-48);
+        pane.setMinSize(Math.min(480,width),Math.min(400,height));pane.setPrefSize(width,height);pane.setMaxSize(Double.MAX_VALUE,Double.MAX_VALUE);
         var ownerRoot=owner.getScene().getRoot();var previousEffect=ownerRoot.getEffect();
-        setOnShown(e->{if(pane.lookup(".button-bar") instanceof ButtonBar bar)bar.setButtonOrder("C+O");setX(Math.max(bounds.getMinX(),Math.min(owner.getX()+(owner.getWidth()-getWidth())/2,bounds.getMaxX()-getWidth())));setY(Math.max(bounds.getMinY(),Math.min(owner.getY()+(owner.getHeight()-getHeight())/2,bounds.getMaxY()-getHeight())));ownerRoot.setEffect(new GaussianBlur(5));name.requestFocus();});
+        setOnShown(e->{if(pane.lookup(".button-bar") instanceof ButtonBar bar)bar.setButtonOrder("C+O");setX(Math.max(bounds.getMinX(),Math.min(owner.getX()+(owner.getWidth()-getWidth())/2,bounds.getMaxX()-getWidth())));setY(Math.max(bounds.getMinY(),Math.min(owner.getY()+(owner.getHeight()-getHeight())/2,bounds.getMaxY()-getHeight())));name.requestFocus();});
         setOnHidden(e->{generation++;ownerRoot.setEffect(previousEffect);});
     }
 }

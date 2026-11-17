@@ -22,7 +22,7 @@ public class SettingsController {
     @FXML private TextField themeName, installPath;
     @FXML private Label status, contrastWarning, memoryInfo, ramValue, defaultPath;
     @FXML private Slider ramSlider;
-    @FXML private CheckBox useMemory;
+    @FXML private CheckBox useMemory, reducedMotion, reducedTransparency;
     @FXML private ComboBox<MemorySettings.Target> memoryTarget;
     @FXML private Button deleteTheme;
     @FXML private VBox settingsContent;
@@ -37,6 +37,8 @@ public class SettingsController {
         ramSlider.setMin(1);ramSlider.setMax(MemorySettings.maxMiB()/1024.0);ramSlider.setBlockIncrement(.25);
         ramSlider.setMajorTickUnit(1);ramSlider.setMinorTickCount(3);ramSlider.setSnapToTicks(true);
         var current=settings.current();
+        reducedMotion.setSelected(current.reducedMotion());reducedTransparency.setSelected(current.reducedTransparency());
+        reducedMotion.setOnAction(e->saveAccessibility());reducedTransparency.setOnAction(e->saveAccessibility());
         useMemory.setSelected(current.memoryMiB()!=0);ramSlider.setValue(current.memoryMiB()==0?Math.min(4,ramSlider.getMax()):current.memoryMiB()/1024.0);
         ramSlider.disableProperty().bind(useMemory.selectedProperty().not());
         installPath.setText(current.installDirectory());
@@ -47,6 +49,10 @@ public class SettingsController {
         themes.setOnAction(e->{if(!loading&&themes.getValue()!=null)selectTheme();});
         baseTheme.setOnAction(e->{if(!loading){base=baseTheme.getValue();draft.clear();draft.putAll(base.colors());editingId=null;deleteTheme.setDisable(true);themeName.clear();editing=true;buildRows();preview();}});
         status.setText(settings.warning());loading=false;loadMemoryTargets();
+    }
+    private void saveAccessibility(){
+        boolean motion=reducedMotion.isSelected(), transparency=reducedTransparency.isSelected();
+        work(()->settings.update(c->c.accessibility(motion,transparency)),()->{ThemeService.restore();status.setText("Confort visuel enregistré.");},false);
     }
     private void updateRam(){ramValue.setText(String.format(Locale.FRANCE,"%.2f Go",ramSlider.getValue())+(ramSlider.getValue()*1024>MemorySettings.freeMiB()?" — mémoire libre actuellement inférieure à ce choix":""));}
     private void refreshChoices(){
@@ -87,16 +93,11 @@ public class SettingsController {
     }
     private void preview(){ThemeService.preview(draft);updateContrast();status.setText("Aperçu non enregistré. Enregistre ton thème ou annule les modifications.");}
     private void updateContrast(){
-        double text=ThemeService.contrast(draft.get(ThemeColor.TEXT),draft.get(ThemeColor.BACKGROUND));
-        double buttons=ThemeService.contrast(draft.get(ThemeColor.BUTTON_TEXT),draft.get(ThemeColor.BUTTON));
-        double play=ThemeService.contrast(draft.get(ThemeColor.BUTTON_TEXT),draft.get(ThemeColor.PLAY));
-        double card=ThemeService.contrast(draft.get(ThemeColor.TEXT),draft.get(ThemeColor.CARD));
-        boolean lowContrast = Math.min(Math.min(text,buttons),Math.min(play,card))<4.5;
-        contrastWarning.getStyleClass().removeAll("warning", "muted");
-        contrastWarning.getStyleClass().add(lowContrast ? "warning" : "muted");
-        contrastWarning.setText(lowContrast
-                ?String.format(Locale.FRANCE,"Contraste à vérifier (objectif 4,5:1) — texte %.1f, cartes %.1f, boutons %.1f, Jouer %.1f.",text,card,buttons,play)
-                :"Contraste des textes principaux et boutons : satisfaisant (au moins 4,5:1).");
+        var palette=ThemeService.renderedColors(draft);
+        double text=ThemeService.contrast(palette.get(ThemeColor.TEXT),palette.get(ThemeColor.CARD));
+        double play=ThemeService.contrast(ThemeService.foreground(draft.get(ThemeColor.PLAY)),draft.get(ThemeColor.PLAY));
+        contrastWarning.getStyleClass().removeAll("warning");contrastWarning.getStyleClass().add("muted");
+        contrastWarning.setText(String.format(Locale.FRANCE,"Contraste affiché — texte %.1f:1 · action principale %.1f:1. La couleur du texte de l’action s’adapte à l’accent.",text,play));
     }
     @FXML private void resetAll(){draft.clear();draft.putAll(base.colors());editing=true;buildRows();preview();}
     @FXML private void cancelPreview(){ThemeService.preview(settings.current().activeColors());loadDraft(settings.current().activeTheme());refreshChoices();status.setText("Aperçu annulé.");}

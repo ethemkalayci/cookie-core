@@ -29,20 +29,21 @@ public final class InstanceContentsPane extends VBox {
     private boolean mutating;
 
     public InstanceContentsPane(InstanceManager manager){
-        service=new InstanceContentService(manager);setSpacing(12);setMinWidth(0);
-        status.setWrapText(true);status.setMinWidth(0);
-        search.setId("contentSearch");search.setPromptText("Rechercher un nom, une version ou un fichier…");search.setAccessibleText("Rechercher dans les contenus");search.setMinWidth(0);HBox.setHgrow(search,Priority.ALWAYS);
+        service=new InstanceContentService(manager);setSpacing(16);setMinWidth(0);
+        status.setWrapText(true);status.setMinWidth(0);status.getStyleClass().add("muted");ViewSupport.collapseWhenEmpty(status);
+        search.setId("contentSearch");search.setPromptText("Rechercher un contenu…");search.setAccessibleText("Rechercher dans les contenus");search.setMinWidth(0);HBox.setHgrow(search,Priority.ALWAYS);
         filter.getItems().setAll("Tous","Actifs","Désactivés");filter.setValue("Tous");filter.setAccessibleText("Filtrer les mods par état");
         search.textProperty().addListener((o,a,b)->applyFilter());filter.setOnAction(e->applyFilter());
         counter.getStyleClass().add("muted");
         list.setItems(filtered);list.getStyleClass().add("content-list");ViewSupport.rounded(list,12);ViewSupport.rounded(progress,8);
-        list.setId("inlineContentList");list.setMinWidth(0);list.setPrefHeight(140);list.setPlaceholder(new Label("Aucun contenu installé dans cette catégorie."));
+        list.setId("inlineContentList");list.setMinWidth(0);list.setPrefHeight(240);list.setPlaceholder(new Label("Aucun contenu installé dans cette catégorie."));
         list.setCellFactory(view->new ListCell<>(){
-            {prefWidthProperty().bind(view.widthProperty().subtract(20));setMaxWidth(Region.USE_PREF_SIZE);}
+            {prefWidthProperty().bind(view.widthProperty().subtract(48));setMaxWidth(Region.USE_PREF_SIZE);}
             @Override protected void updateItem(InstanceContentService.Item item,boolean empty){super.updateItem(item,empty);setText(null);setGraphic(empty||item==null?null:row(item));}
         });
-        var actions=new FlowPane(10,8,add,refresh,folder);progress.setMaxWidth(Double.MAX_VALUE);progress.setVisible(false);progress.setManaged(false);
-        getChildren().addAll(new HBox(10,search,filter),actions,counter,status,progress,list);controls(false);
+        var actions=new FlowPane(8,8,add,refresh,folder,counter);actions.setAlignment(Pos.CENTER_LEFT);actions.getStyleClass().add("content-tools");
+        counter.setTooltip(new Tooltip("La compatibilité des mods détectée reste partielle. Consulte les avertissements de chaque fichier."));progress.setMaxWidth(Double.MAX_VALUE);progress.setVisible(false);progress.setManaged(false);
+        getChildren().addAll(new HBox(12,search,filter),actions,status,progress,list);controls(false);
         add.setOnAction(e->addFiles());refresh.setOnAction(e->load());folder.setOnAction(e->{String id=instanceId;var type=kind;mutate(p->{Path path=service.directory(id,type);if(!Files.isDirectory(path))throw new IOException("Ce dossier sera créé lors de l’ajout d’un contenu.");java.awt.Desktop.getDesktop().open(path.toFile());});});
     }
     public void show(String id,InstanceContentService.Kind type){kind=type;instanceId=id;load();}
@@ -55,17 +56,17 @@ public final class InstanceContentsPane extends VBox {
         String query=search.getText().strip().toLowerCase(java.util.Locale.ROOT);
         filtered.setPredicate(item->(query.isEmpty()||(item.name()+" "+item.file()+" "+item.version()).toLowerCase(java.util.Locale.ROOT).contains(query))
             && (kind!=InstanceContentService.Kind.MODS||"Tous".equals(filter.getValue())||("Désactivés".equals(filter.getValue())==item.disabled())));
-        counter.setText(filtered.size()+" / "+all.size()+" contenu(s)");
+        counter.setText((filtered.size()==all.size()?String.valueOf(all.size()):filtered.size()+" / "+all.size())+" contenu(s)");
     }
     private void controls(boolean enabled){add.setDisable(!enabled||mutating);refresh.setDisable(kind==null||mutating);folder.setDisable(!enabled||mutating);list.setDisable(mutating);}
     private void load(){
         int request=++generation;String id=instanceId;var type=kind;all.clear();applyFilter();controls(false);
         if(type==null)return;
-        if(id==null){status.setText("Sélectionne une instance officielle dans le carrousel.");return;}
+        if(id==null){status.setText("Sélectionne une instance officielle dans la liste en haut de la page.");return;}
         filter.setVisible(type==InstanceContentService.Kind.MODS);filter.setManaged(type==InstanceContentService.Kind.MODS);
         status.setText("Chargement des contenus…");list.setPlaceholder(new Label("Chargement…"));
         Task<List<InstanceContentService.Item>> task=new Task<>(){protected List<InstanceContentService.Item> call()throws Exception{return service.list(id,type);}};
-        task.setOnSucceeded(e->{if(request!=generation)return;all.setAll(task.getValue());applyFilter();list.setPlaceholder(new Label("Aucun contenu ne correspond à cette sélection."));list.setPrefHeight(Math.max(140,Math.min(500,task.getValue().size()*112+8)));controls(true);status.setText((type==InstanceContentService.Kind.MODS?"La compatibilité détectée reste partielle.":"À activer ensuite dans les options de Minecraft."));});
+        task.setOnSucceeded(e->{if(request!=generation)return;all.setAll(task.getValue());applyFilter();list.setPlaceholder(new Label("Aucun contenu ne correspond à cette sélection."));list.setPrefHeight(Math.max(140,Math.min(440,task.getValue().size()*92+8)));controls(true);status.setText((type==InstanceContentService.Kind.MODS?"":"À activer dans les options de Minecraft."));});
         task.setOnFailed(e->{if(request!=generation)return;list.setPlaceholder(new Label("Contenus indisponibles"));status.setText(task.getException() instanceof NoSuchFileException?"Installe d’abord cette instance pour accéder à ses contenus.":"Contenus indisponibles : "+task.getException().getMessage());});
         worker(task,"instance-content-list");
     }
@@ -80,8 +81,15 @@ public final class InstanceContentsPane extends VBox {
         remove.setOnAction(e->{var dialog=new Alert(Alert.AlertType.CONFIRMATION,"Retirer « "+item.name()+" » ? Une copie sera conservée dans les sauvegardes de contenus.",ButtonType.OK,ButtonType.CANCEL);dialog.initOwner(getScene().getWindow());ThemeService.attach(dialog);if(dialog.showAndWait().orElse(ButtonType.CANCEL)==ButtonType.OK)mutate(p->service.remove(id,type,item.file()));});
         remove.getStyleClass().add("secondary-button");
         var actions=new FlowPane(8,6);if(type==InstanceContentService.Kind.MODS){var toggle=new Button(item.disabled()?"Activer":"Désactiver");toggle.setOnAction(e->mutate(p->service.toggle(id,item.file())));actions.getChildren().add(toggle);}actions.getChildren().add(remove);
-        var text=new VBox(5,name,info,warning,actions);text.setMinWidth(0);HBox.setHgrow(text,Priority.ALWAYS);
-        var row=new HBox(14,icon,text);row.setAlignment(Pos.TOP_LEFT);row.setMinWidth(0);return row;
+        var text=new VBox(6,name,info,warning);text.setMinWidth(0);HBox.setHgrow(text,Priority.ALWAYS);
+        var row=new HBox(16,icon,text,actions);row.setAlignment(Pos.CENTER_LEFT);row.setMinWidth(0);
+        actions.setPrefWrapLength(190);actions.setMinWidth(180);actions.setMaxWidth(190);
+        row.widthProperty().addListener((o,a,b)->{
+            boolean narrow=b.doubleValue()<620;
+            if(narrow && !text.getChildren().contains(actions)){row.getChildren().remove(actions);text.getChildren().add(actions);}
+            else if(!narrow && text.getChildren().contains(actions)){text.getChildren().remove(actions);row.getChildren().add(actions);}
+        });
+        row.getStyleClass().add("content-row");return row;
     }
     private void addFiles(){
         String id=instanceId;var type=kind;if(id==null||type==null)return;

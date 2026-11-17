@@ -5,14 +5,14 @@
 <?import javafx.geometry.Insets?>
 <AnchorPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="be.cookies.studio.core.controller.HomeController">
  <children><ScrollPane fx:id="homeScrollPane" fitToWidth="true" hbarPolicy="NEVER" styleClass="home-scroll" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
- <content><VBox spacing="28" styleClass="page,home-page">
+ <content><StackPane alignment="TOP_CENTER" minWidth="0"><VBox spacing="28" styleClass="page,home-page" maxWidth="Infinity" minWidth="0" maxHeight="-Infinity">
   <HBox alignment="CENTER_LEFT" spacing="16">
    <VBox spacing="6" HBox.hgrow="ALWAYS" minWidth="0"><Label text="TON POINT DE DÉPART" styleClass="eyebrow"/><Label fx:id="welcomeLabel" text="Bienvenue !" styleClass="page-title" wrapText="true" minHeight="-Infinity"/></VBox>
    <Button fx:id="newsButton" accessibleText="Voir les actualités" styleClass="home-notification-button"><tooltip><Tooltip text="Aller aux actualités"/></tooltip></Button>
   </HBox>
   <StackPane fx:id="bannerPane" prefHeight="420" styleClass="home-banner">
-   <Region mouseTransparent="true" styleClass="banner-gradient"/>
-   <Region mouseTransparent="true" prefHeight="200" maxHeight="200" styleClass="banner-bottom-fade" StackPane.alignment="BOTTOM_CENTER"/>
+
+
    <VBox alignment="CENTER_LEFT" spacing="12" maxHeight="-Infinity" maxWidth="600" styleClass="hero-copy" StackPane.alignment="CENTER_LEFT">
     <StackPane.margin><Insets top="24" right="24" bottom="24" left="24"/></StackPane.margin>
     <Label fx:id="lastInstanceSubtitle" text="TON AVENTURE COMMENCE ICI" styleClass="eyebrow" wrapText="true"/>
@@ -20,13 +20,14 @@
     <Label fx:id="lastInstanceVersions" styleClass="home-instance-details" wrapText="true" minHeight="-Infinity"/>
     <Label fx:id="lastInstanceDate" styleClass="home-instance-meta" wrapText="true" minHeight="-Infinity"/>
     <Label fx:id="lastInstanceStatus" styleClass="home-instance-meta" wrapText="true" minHeight="-Infinity"/>
-    <Button fx:id="lastInstancePlay" onAction="#playLastInstance" text="DÉCOUVRIR LES INSTANCES" styleClass="home-play-button" wrapText="true" maxWidth="Infinity"/>
+    <Button fx:id="lastInstancePlay" onAction="#playLastInstance" text="DÉCOUVRIR LES INSTANCES" styleClass="home-play-button" wrapText="true" maxWidth="320"/>
    </VBox>
   </StackPane>
-  <VBox fx:id="newsSection" spacing="16" styleClass="home-news">
+  <StackPane alignment="TOP_CENTER" minWidth="0"><VBox maxWidth="1368" minWidth="0" fx:id="newsSection" spacing="16" styleClass="home-news">
    <Label text="Le journal du studio" styleClass="section-title"/>
    <Label fx:id="newsStatusLabel" text="Les prochaines annonces apparaîtront ici." wrapText="true" styleClass="home-news-description"/>
    <TilePane minWidth="0" fx:id="newsGrid" hgap="20" vgap="20" prefColumns="3" prefTileWidth="280" tileAlignment="TOP_LEFT" styleClass="news-grid"/>
   </VBox>
- </VBox></content></ScrollPane></children>
+ </StackPane>
+ </VBox></StackPane></content></ScrollPane></children>
 </AnchorPane>

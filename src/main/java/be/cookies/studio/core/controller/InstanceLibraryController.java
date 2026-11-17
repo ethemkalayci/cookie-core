@@ -52,7 +52,7 @@ public final class InstanceLibraryController {
         this.manager=manager;contents=new InstanceContentService(manager);this.account=account;this.changed=changed;initialId=selected;
         for(var i:official)catalog.put(i.getId(),i);
         stage.setTitle("Cookie Core — Gestion des instances");stage.setMinWidth(780);stage.setMinHeight(540);
-        title.setText(selected!=null&&selected.startsWith("cookiecore-official-")?"Gérer l’instance officielle":"Mes instances");title.getStyleClass().add("page-title");details.setMinWidth(0);HBox.setHgrow(details,Priority.ALWAYS);instances.setId("localInstances");items.setId("localContents");details.setId("instanceDetails");details.setWrapText(true);status.setWrapText(true);contentHelp.setWrapText(true);contentDetails.setWrapText(true);
+        title.setText(selected!=null&&selected.startsWith("cookiecore-official-")?"Gérer l’instance officielle":"Mes instances");title.getStyleClass().add("page-title");title.setWrapText(true);contentDetails.setMinWidth(0);HBox.setHgrow(contentDetails,Priority.ALWAYS);details.setMinWidth(0);HBox.setHgrow(details,Priority.ALWAYS);instances.setId("localInstances");items.setId("localContents");details.setId("instanceDetails");details.setWrapText(true);status.setWrapText(true);contentHelp.setWrapText(true);contentDetails.setWrapText(true);
         instances.setPrefHeight(110);items.setPrefHeight(260);
         be.cookies.studio.core.ui.ViewSupport.rounded(instances,12);be.cookies.studio.core.ui.ViewSupport.rounded(items,12);be.cookies.studio.core.ui.ViewSupport.rounded(progress,8);
         instanceImage.setFitWidth(160);instanceImage.setFitHeight(90);instanceImage.setPreserveRatio(true);kind.setValue(InstanceContentService.Kind.MODS);
@@ -75,12 +75,15 @@ public final class InstanceLibraryController {
         var openContents=button("Ouvrir ce dossier",()->run(p->{Path folder=contents.directory(requireId(),selectedKind);if(!Files.isDirectory(folder))throw new IOException("Ce dossier n'existe pas encore. Ajoute un contenu pour le créer.");openFolder(folder);return null;},v->{}));
         toggle.disableProperty().bind(kind.valueProperty().isNotEqualTo(InstanceContentService.Kind.MODS));
         contentImage.setFitWidth(64);contentImage.setFitHeight(64);contentImage.setPreserveRatio(true);
-        body.getChildren().addAll(title,new FlowPane(10,10,create,importButton,refresh),instances,new HBox(14,instanceImage,details),controls,advanced,new Separator(),kind,contentHelp,items,new HBox(12,contentImage,contentDetails),new FlowPane(10,10,add,toggle,remove,openContents));
+        var identity=new VBox(18,new HBox(14,instanceImage,details),controls,advanced);identity.getStyleClass().add("surface-card");
+        var contentPanel=new VBox(16,kind,contentHelp,items,new HBox(12,contentImage,contentDetails),new FlowPane(10,10,add,toggle,remove,openContents));contentPanel.getStyleClass().add("surface-card");
+        var tabs=new TabPane(new Tab("Vue d’ensemble",identity),new Tab("Mods, shaders et resource packs",contentPanel));tabs.setMinHeight(Region.USE_PREF_SIZE);tabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        body.getChildren().addAll(title,new FlowPane(10,10,create,importButton,refresh),instances,tabs);
         if(officialScope){instances.setVisible(false);instances.setManaged(false);}
-        body.setPadding(new Insets(24));var scroll=new ScrollPane(body);scroll.setFitToWidth(true);scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        body.setPadding(new Insets(24));var scroll=new ScrollPane(be.cookies.studio.core.ui.ViewSupport.centered(body,1200));scroll.setFitToWidth(true);scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         progress.setMaxWidth(Double.MAX_VALUE);progress.setVisible(false);progress.setManaged(false);cancel.setVisible(false);cancel.setManaged(false);
         var footer=new VBox(8,status,progress,cancel);footer.setPadding(new Insets(12,24,16,24));
-        BorderPane root=new BorderPane(scroll);root.setBottom(footer);var scene=new Scene(root,1050,760);ThemeService.attach(scene);stage.setScene(scene);
+        var root=new be.cookies.studio.core.ui.ImmersiveShell();root.getStyleClass().add("library-shell");root.setCenter(scroll);root.setBottom(be.cookies.studio.core.ui.ViewSupport.centered(footer,1200));footer.getStyleClass().add("operation-footer");var scene=new Scene(root,1050,760);ThemeService.attach(scene);stage.setScene(scene);
         cancel.setOnAction(e->{cancelled.set(true);cancel.setDisable(true);cancel.setText("Annulation demandée…");});
         stage.setOnCloseRequest(e->{if(busy){e.consume();cancel.setText("Attends la fin ou annule à un point sûr");}});
         instances.getSelectionModel().selectedItemProperty().addListener((o,a,b)->{selectedId=b==null?null:b.id();if(b!=null&&!busy)loadDetails();});
@@ -131,6 +134,7 @@ public final class InstanceLibraryController {
             if(published!=null&&published.getImagePath()!=null&&!published.getImagePath().isBlank())artwork=published.getImagePath();
             else if((artwork==null||artwork.isBlank())&&i.official().getImagePath()!=null)artwork=i.official().getImagePath();
         }
+        ((be.cookies.studio.core.ui.ImmersiveShell)stage.getScene().getRoot()).showArtwork(artwork);
         final String imageSource=artwork;
         if(imageSource!=null&&!imageSource.isBlank()){
             if(imageSource.startsWith("https://"))new NewsImageCacheService().resolve(imageSource).whenComplete((file,error)->Platform.runLater(()->{if(error==null&&file!=null&&Objects.equals(id(),i.id()))instanceImage.setImage(new Image(file.toUri().toString(),160,90,true,true,true));}));

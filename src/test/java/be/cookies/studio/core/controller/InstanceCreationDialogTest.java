@@ -16,7 +16,7 @@ class InstanceCreationDialogTest {
   var compatible=new CompletableFuture<Void>();Stage[] owner={null};InstanceCreationDialog[] dialog={null};
   try{
    fx(()->{owner[0]=new Stage();owner[0].setScene(new Scene(new VBox(),1000,760));ThemeService.attach(owner[0].getScene());owner[0].show();dialog[0]=new InstanceCreationDialog(owner[0],List.of("1.20.1"),(mc,loader)->List.of("47.4.28","47.4.27"));dialog[0].show();var pane=dialog[0].getDialogPane();pane.applyCss();pane.layout();
-    assertEquals(StageStyle.UNDECORATED,((Stage)pane.getScene().getWindow()).getStyle());assertFalse(dialog[0].isResizable());assertEquals(Modality.WINDOW_MODAL,dialog[0].getModality());assertNotNull(owner[0].getScene().getRoot().getEffect());
+    assertEquals(StageStyle.DECORATED,((Stage)pane.getScene().getWindow()).getStyle());assertTrue(dialog[0].isResizable());assertEquals(Modality.WINDOW_MODAL,dialog[0].getModality());assertNull(owner[0].getScene().getRoot().getEffect());
     assertEquals(4,pane.lookupAll(".radio-button").size());assertTrue(((RadioButton)pane.lookup("#creationVANILLA")).isSelected());
     Button create=(Button)pane.lookupButton(pane.getButtonTypes().stream().filter(b->b.getText().equals("Créer")).findFirst().orElseThrow());assertTrue(create.isDisabled());((TextField)pane.lookup("#creationName")).setText("Mon aventure");assertFalse(create.isDisabled());
     var version=(ComboBox<?>)pane.lookup("#creationLoaderVersion");version.valueProperty().addListener((o,a,b)->{if("47.4.28".equals(b))compatible.complete(null);});((RadioButton)pane.lookup("#creationFORGE")).fire();return null;});

@@ -3,12 +3,12 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="home-scroll" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="be.cookies.studio.core.controller.AccountController">
- <content><VBox spacing="20" styleClass="page,account-page">
-  
+ <content><StackPane alignment="TOP_CENTER" minWidth="0"><VBox spacing="20" styleClass="page,account-page" maxWidth="1100" minWidth="0" maxHeight="-Infinity">
+
   <Label text="TON ESPACE JOUEUR" styleClass="eyebrow"/>
   <Label text="Compte Minecraft" styleClass="page-title"/>
-  <VBox spacing="22" maxWidth="1000" styleClass="account-card,surface-card">
-   
+  <VBox spacing="22" maxWidth="Infinity" styleClass="account-card,surface-card">
+
    <HBox spacing="22" alignment="CENTER_LEFT">
     <StackPane minWidth="80" prefWidth="80" maxWidth="80" minHeight="80" prefHeight="80" styleClass="account-avatar">
      <Label fx:id="profileInitial" text="?" styleClass="account-avatar-letter"/>
@@ -20,19 +20,19 @@
    </HBox>
    <Label fx:id="profileDescription" wrapText="true" maxWidth="720" styleClass="account-description"/>
    <FlowPane hgap="14" vgap="14">
-    <Button fx:id="connectButton" onAction="#connect" text="Se connecter avec Microsoft" styleClass="home-play-button"/>
-    <Button fx:id="refreshButton" onAction="#refresh" text="Actualiser le profil" styleClass="secondary-button"/>
+    <Button wrapText="true" fx:id="connectButton" onAction="#connect" text="Se connecter avec Microsoft" styleClass="home-play-button"/>
+    <Button wrapText="true" fx:id="refreshButton" onAction="#refresh" text="Actualiser le profil" styleClass="secondary-button"/>
    </FlowPane>
    <Label fx:id="statusLabel" wrapText="true" maxWidth="720" styleClass="account-description"/>
    <ProgressIndicator fx:id="progress" maxWidth="32" maxHeight="32"/>
    <FlowPane fx:id="connectionActions" hgap="14" vgap="14">
-    <Button fx:id="finishButton" text="J'ai terminé dans Prism" onAction="#finish" styleClass="secondary-button"/>
-    <Button fx:id="cancelButton" text="Annuler" onAction="#cancel" styleClass="secondary-button"/>
+    <Button wrapText="true" fx:id="finishButton" text="J'ai terminé dans Prism" onAction="#finish" styleClass="secondary-button"/>
+    <Button wrapText="true" fx:id="cancelButton" text="Annuler" onAction="#cancel" styleClass="secondary-button"/>
    </FlowPane>
   </VBox>
-  <VBox spacing="10" maxWidth="1000">
+  <TitledPane text="Changer de joueur" expanded="false" maxWidth="Infinity"><content><VBox spacing="10">
    <Label text="Un compte, toutes tes instances" styleClass="account-section-title"/>
    <Label text="Pour changer de joueur, ouvre Prism, ajoute un compte Microsoft puis choisis-le comme compte par défaut. Valide ensuite avec « J'ai terminé dans Prism »." wrapText="true" styleClass="account-description"/>
-  </VBox>
- </VBox></content>
+  </VBox></content></TitledPane>
+ </VBox></StackPane></content>
 </ScrollPane>

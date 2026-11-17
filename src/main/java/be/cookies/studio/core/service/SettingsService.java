@@ -40,7 +40,7 @@ public final class SettingsService {
             int ram=j.get("memoryMiB").getAsInt();if(ram!=0&&(ram<1024||ram>MemorySettings.maxMiB()))ram=0;
             String path=j.get("installDirectory").getAsString();
             if(!path.isBlank()&&!Path.of(path).isAbsolute())path="";
-            current=new LauncherSettings(active,custom,ram,path);
+            current=new LauncherSettings(active,custom,ram,path,j.has("reducedMotion") && j.get("reducedMotion").getAsBoolean(),j.has("reducedTransparency") && j.get("reducedTransparency").getAsBoolean());
         } catch(Exception e){current=LauncherSettings.defaults();warning="Préférences illisibles : valeurs sûres restaurées. Le fichier d'origine est conservé.";}
     }
     public synchronized LauncherSettings update(UnaryOperator<LauncherSettings> change) throws IOException {

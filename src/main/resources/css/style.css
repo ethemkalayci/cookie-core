@@ -176,3 +176,110 @@
 .instance-creation-dialog .radio-button .radio { -fx-background-color: -cc-panel; -fx-padding: 6; }
 .instance-creation-dialog .radio-button:selected .radio { -fx-background-color: -cc-accent; }
 .instance-creation-dialog .radio-button:selected .dot { -fx-background-color: -cc-text; }
+/* Immersive desktop composition — JavaFX materials, never native Apple glass.
+   Neutral surfaces / 14–16 px body / 24–48 px headings / 8 px spacing rhythm. */
+.root { -cc-play-ink: white; -cc-action-ink: white; }
+.app-shell { -fx-background-color: #101216; }
+.page-host, .page, .home-scroll, .instance-scroll,
+.home-scroll > .viewport, .instance-scroll > .viewport,
+.library-shell .scroll-pane, .library-shell .scroll-pane > .viewport { -fx-background-color: transparent; }
+.page { -fx-padding: 24 36 40 36; }
+.world-shade { -fx-background-color: linear-gradient(from 0% 0% to 100% 0%, rgba(10,12,16,.84) 0%, rgba(10,12,16,.56) 50%, rgba(10,12,16,.25) 100%), linear-gradient(to bottom, rgba(10,12,16,.12) 0%, rgba(10,12,16,.3) 45%, rgba(10,12,16,.94) 100%); }
+.glass-tint { -fx-background-color: linear-gradient(to bottom, rgba(34,38,46,.82), rgba(18,21,27,.93)); -fx-border-color: rgba(255,255,255,.18); -fx-border-width: 1; -fx-background-radius: 16; -fx-border-radius: 16; }
+.sidebar, .sidebar-scroll, .sidebar-scroll > .viewport { -fx-background-color: transparent; }
+.sidebar { -fx-padding: 24 12 16 12; }
+.brand { -fx-padding: 0 8 24 8; }
+.brand-caption { -fx-font-size: 11px; -fx-opacity: 1; }
+.nav-caption { -fx-font-size: 11px; -fx-opacity: 1; }
+.sidebar .nav-button { -fx-background-color: transparent; -fx-font-size: 13px; -fx-background-radius: 10; -fx-border-radius: 10; }
+.sidebar .nav-button.active { -fx-background-color: rgba(255,255,255,.12); -fx-text-fill: -cc-text; -fx-border-color: transparent transparent transparent -cc-selection; }
+.sidebar .nav-button.active .theme-icon SVGPath, .sidebar .nav-button.active .theme-icon Path { -fx-fill: -cc-text; }
+.sidebar .nav-button:hover { -fx-background-color: rgba(255,255,255,.08); }
+.page-title { -fx-font-size: 32px; }
+.eyebrow { -fx-font-size: 12px; -fx-text-fill: #D3D9E2; }
+.muted, .home-instance-meta, .news-card-date { -fx-font-size: 13px; -fx-text-fill: -cc-text-muted; }
+.page-description, .account-description, .home-news-description { -fx-font-size: 15px; -fx-opacity: 1; }
+.home-banner, .instance-banner { -fx-background-image: none; -fx-background-color: transparent; }
+.home-instance-title, .instance-title { -fx-font-size: 46px; -fx-text-fill: #F4F5F7; }
+.home-instance-details, .instance-version { -fx-font-size: 16px; -fx-text-fill: #D4DAE4; }
+.hero-copy { -fx-padding: 8 0; }
+.hero-toolbar { -fx-padding: 14 18; -fx-background-color: rgba(24,28,35,.87); -fx-background-radius: 14; -fx-border-radius: 14; -fx-border-color: rgba(255,255,255,.18); -fx-border-width: 1; }
+.surface-card { -fx-background-color: #20242C; -fx-border-color: #3B424E; -fx-background-radius: 14; -fx-border-radius: 14; -fx-padding: 24; }
+.button { -fx-background-color: -cc-panel; -fx-text-fill: -cc-text; -fx-background-radius: 10; -fx-border-radius: 10; }
+.button:hover { -fx-background-color: #353D49; -fx-text-fill: -cc-text; }
+.home-play-button, .instance-play-button, .primary-button { -fx-background-color: -cc-play; -fx-text-fill: -cc-play-ink; -fx-min-height: 48; -fx-font-size: 15px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,.24), 10, 0, 0, 3); }
+.home-play-button:hover, .instance-play-button:hover, .primary-button:hover { -fx-background-color: -cc-play; -fx-text-fill: -cc-play-ink; -fx-border-color: rgba(255,255,255,.65); }
+.button:focused, .sidebar .nav-button:focused, .text-field:focused, .combo-box:focused, .color-picker:focused { -fx-border-color: #F4F5F7; -fx-effect: dropshadow(gaussian, -cc-selection, 6, .4, 0, 0); }
+.button:disabled { -fx-opacity: .65; }
+.content-tabs .button:selected { -fx-background-color: -cc-panel; -fx-text-fill: -cc-text; -fx-border-color: -cc-selection; }
+.settings-page > .tab-pane { -fx-background-color: #191C22; -fx-padding: 20; -fx-background-radius: 16; }
+.tab-pane .tab-content-area, .tab-pane .tab-header-background { -fx-background-color: transparent; }
+.tab { -fx-background-color: transparent; -fx-padding: 10 16; }
+.tab:selected { -fx-background-color: #23272F; -fx-border-color: -cc-selection; }
+.titled-pane { -fx-text-fill: -cc-text; }
+.titled-pane > .title { -fx-background-color: #282D36; -fx-padding: 14; }
+.titled-pane > .content { -fx-background-color: #191C22; -fx-border-color: #454C59; -fx-padding: 16; }
+.titled-pane > .title > .arrow-button .arrow { -fx-background-color: -cc-text; }
+.dialog-pane { -fx-background-color: #191C22; -fx-padding: 24; -fx-font-size: 14px; }
+.dialog-pane > .content.label { -fx-text-fill: #F4F5F7; -fx-wrap-text: true; -fx-padding: 20 0; }
+.dialog-pane:header .header-panel { -fx-background-color: #191C22; -fx-padding: 0 0 16 0; }
+.dialog-pane:header .header-panel .label { -fx-text-fill: #F4F5F7; -fx-font-size: 21px; }
+.dialog-pane > .button-bar { -fx-padding: 16 0 0 0; }
+.dialog-pane .button:default { -fx-background-color: -cc-play; -fx-text-fill: -cc-play-ink; }
+.context-menu { -fx-background-color: #23272F; -fx-background-radius: 12; -fx-border-color: #454C59; -fx-border-radius: 12; -fx-padding: 8; }
+.menu-item { -fx-padding: 10 16; }
+.menu-item:focused { -fx-background-color: #353D49; }
+.hyperlink { -fx-text-fill: #CDD9EE; -fx-underline: true; }
+.operation-footer { -fx-background-color: #191C22; -fx-border-color: #454C59; -fx-border-width: 1 0 0 0; }
+.opaque .glass-tint, .opaque .hero-toolbar { -fx-background-color: #191C22; }
+.opaque .world-shade { -fx-background-color: rgba(10,12,16,.88); }
+.app-shell:compact .page { -fx-padding: 20 24; }
+.app-shell:compact .home-instance-title, .app-shell:compact .instance-title { -fx-font-size: 34px; }
+.app-shell:short .sidebar .nav-button { -fx-min-height: 36; -fx-pref-height: 36; }
+.app-shell:short .brand { -fx-padding: 0 4 8 4; }
+.vanilla-hero { -fx-padding: 64 24; }
+.account-avatar-letter { -fx-text-fill: ladder(-cc-accent, white 49%, #101216 50%); }
+.app-shell:compact .hero-copy { -fx-padding: 8 0; }
+.root { -cc-selection-ink: white; }
+.list-cell:filled:selected { -fx-text-fill: -cc-selection-ink; }
+.library-shell .tab-pane { -fx-padding: 12 0; }
+
+/* Matériau dépoli teinté : la lisibilité vient du flou du décor, pas de panneaux noirs. */
+.root { -cc-material: rgba(43,40,59,.78); -cc-material-solid: #2B283B; -cc-wash: rgba(43,40,59,.52); }
+.world-shade { -fx-background-color: -cc-wash, linear-gradient(to bottom, rgba(12,15,22,.18), rgba(12,15,22,.48)); }
+.glass-tint, .hero-toolbar, .surface-card, .settings-page > .tab-pane { -fx-background-color: -cc-material; -fx-border-color: rgba(255,255,255,.16); -fx-border-width: 1; }
+.content-list, .content-list .list-cell { -fx-background-color: transparent; }
+.content-list { -fx-border-color: rgba(255,255,255,.10); -fx-padding: 4 12; }
+.content-list .list-cell { -fx-padding: 18 4; -fx-border-color: transparent transparent rgba(255,255,255,.09) transparent; }
+.content-list .list-cell:filled:hover { -fx-background-color: rgba(255,255,255,.05); }
+.content-list .list-cell:filled:selected { -fx-background-color: rgba(255,255,255,.08); }
+.content-row .button { -fx-font-size: 13px; -fx-font-weight: normal; }
+.content-row .card-title { -fx-font-size: 17px; }
+.button:focused, .sidebar .nav-button:focused, .text-field:focused, .combo-box:focused, .color-picker:focused { -fx-effect: null; -fx-border-color: -cc-selection; }
+.content-tabs .button:selected { -fx-background-color: rgba(255,255,255,.10); -fx-border-color: transparent transparent -cc-selection transparent; }
+.text-field, .combo-box, .color-picker { -fx-background-color: rgba(16,20,28,.42); -fx-border-color: rgba(255,255,255,.20); -fx-border-width: 1; }
+.palette-scroll, .palette-scroll > .viewport { -fx-background-color: transparent; }
+.color-row { -fx-background-color: rgba(255,255,255,.04); }
+.titled-pane > .title { -fx-background-color: rgba(255,255,255,.06); }
+.titled-pane > .content { -fx-background-color: rgba(16,20,28,.22); -fx-border-color: rgba(255,255,255,.12); }
+.opaque .surface-card, .opaque .glass-tint, .opaque .hero-toolbar, .opaque .settings-page > .tab-pane { -fx-background-color: -cc-material-solid; }
+
+.settings-page > .tab-pane { -fx-border-radius: 16; }
+
+/* Actualités ouvertes et espace de contenus simplifié. */
+.home-news, .home-news .news-card, .home-news .news-card-content,
+.home-news .news-card:hover { -fx-background-color: transparent; -fx-border-color: transparent; -fx-effect: null; }
+.home-news .news-card-content { -fx-padding: 18 0 0 0; }
+.home-news .news-card-description { -fx-text-fill: #E0E4EB; -fx-font-size: 14px; }
+.home-news .news-card { -fx-border-width: 0; }
+.instance-launch-actions, .opaque .instance-launch-actions { -fx-background-color: transparent; -fx-border-color: transparent; -fx-effect: null; -fx-padding: 12 24; }
+.instance-customization { -fx-padding: 24; -fx-background-color: rgba(20,24,32,.32); -fx-background-radius: 16; }
+.instance-customization .content-tabs { -fx-padding: 0 0 12 0; -fx-border-color: transparent transparent rgba(255,255,255,.15) transparent; }
+.instance-customization .content-tabs .button { -fx-background-color: transparent; -fx-padding: 10 20; -fx-font-size: 15px; }
+.instance-customization .content-tabs .button:selected { -fx-background-color: rgba(255,255,255,.09); -fx-border-color: transparent transparent -cc-selection transparent; }
+.content-tools .button { -fx-background-color: rgba(255,255,255,.07); -fx-font-weight: normal; -fx-min-height: 36; -fx-padding: 7 12; }
+.content-tools .label { -fx-padding: 0 12; }
+.instance-customization .content-list { -fx-border-color: transparent; -fx-padding: 0; }
+.instance-customization .content-row .secondary-button { -fx-background-color: transparent; }
+.instance-customization .content-row .button:hover { -fx-background-color: rgba(255,255,255,.12); }
+.opaque .instance-customization { -fx-background-color: -cc-material-solid; }

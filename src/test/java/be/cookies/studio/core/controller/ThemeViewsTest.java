@@ -28,20 +28,35 @@ class ThemeViewsTest {
    var l=loader(name);Parent view=l.load();Scene scene=new Scene(view,1200,900);ThemeService.attach(scene);
    for(var theme:Theme.values()){
     ThemeService.preview(theme.colors());view.applyCss();view.layout();
-    assertEquals(Color.web(theme.colors().get(ThemeColor.BACKGROUND)),((Region)view).getBackground().getFills().getFirst().getFill(),name+" "+theme);
-    Node viewport=view.lookup(".viewport");if(viewport instanceof Region r)assertEquals(Color.web(theme.colors().get(ThemeColor.BACKGROUND)),r.getBackground().getFills().getFirst().getFill());
+    assertTrue(view.getStyle().contains("-cc-background:#101216"),name+" "+theme);
+    assertTrue(view.getStyle().contains("-cc-play:"+theme.colors().get(ThemeColor.PLAY)),name+" accent conservé");
+    Node viewport=view.lookup(".viewport");if(viewport instanceof Region r)assertEquals(Color.TRANSPARENT,r.getBackground().getFills().getFirst().getFill());
    }
   }ThemeService.preview(Theme.AMETHYSTE.colors());return null;
+ });}
+ @Test void expandedPaletteScrollsToLastColor() throws Exception {fx(()->{
+  var l=loader("settings");Parent view=l.load();ThemeService.attach(new Scene(view,1000,720));
+  var pane=(TitledPane)l.getNamespace().get("palettePane");pane.setExpanded(true);
+  view.applyCss();view.layout();view.layout();
+  var scroll=(ScrollPane)l.getNamespace().get("paletteScroll");
+  assertTrue(scroll.getContent().getLayoutBounds().getHeight()>scroll.getViewportBounds().getHeight());
+  scroll.setVvalue(1);view.layout();scroll.layout();
+  var rows=(VBox)l.getNamespace().get("colorRows");var last=rows.getChildren().getLast();
+  var lastBounds=last.localToScene(last.getBoundsInLocal());
+  var viewport=scroll.lookup(".viewport");var visible=viewport.localToScene(viewport.getBoundsInLocal());
+  assertTrue(lastBounds.getMaxY()<=visible.getMaxY()+2,"Dernière couleur accessible en bas de la palette");
+  assertTrue(lastBounds.getMinY()>=visible.getMinY()-2);
+  ((ScrollPane)view).setVvalue(1);view.layout();snapshot(view,"build/palette-scroll-verified.png");return null;
  });}
  @Test void editorHasEveryVariableAndPreviewsCancelsAndResets() throws Exception {fx(()->{
   var l=loader("settings");Parent view=l.load();Scene scene=new Scene(view,1200,900);ThemeService.attach(scene);ThemeService.preview(Theme.AMETHYSTE.colors());view.applyCss();view.layout();
   VBox rows=(VBox)view.lookup("#colorRows");assertEquals(ThemeColor.values().length,rows.getChildren().stream().filter(n->n instanceof FlowPane).count());
   FlowPane first=(FlowPane)rows.getChildren().stream().filter(n->n instanceof FlowPane).findFirst().orElseThrow();
   TextField hex=(TextField)first.getChildren().stream().filter(n->n instanceof TextField).findFirst().orElseThrow();
-  hex.setText("#123456");view.applyCss();assertEquals(Color.web("#123456"),((Region)view).getBackground().getFills().getFirst().getFill());
+  hex.setText("#123456");view.applyCss();assertTrue(view.getStyle().contains("-cc-background:#101216"));
   assertEquals("#0E0B1D",Theme.AMETHYSTE.colors().get(ThemeColor.BACKGROUND));
-  Button reset=(Button)first.getChildren().stream().filter(n->n instanceof Button).findFirst().orElseThrow();reset.fire();view.applyCss();assertEquals(Color.web("#0E0B1D"),((Region)view).getBackground().getFills().getFirst().getFill());
-  hex.setText("#654321");((SettingsController)l.getController()).dispose();view.applyCss();assertEquals(Color.web("#0E0B1D"),((Region)view).getBackground().getFills().getFirst().getFill());
+  Button reset=(Button)first.getChildren().stream().filter(n->n instanceof Button).findFirst().orElseThrow();reset.fire();view.applyCss();assertTrue(view.getStyle().contains("-cc-background:#101216"));
+  hex.setText("#654321");((SettingsController)l.getController()).dispose();view.applyCss();assertTrue(view.getStyle().contains("-cc-background:#101216"));
   ThemeService.preview(Theme.AMETHYSTE.colors());view.applyCss();view.layout();snapshot(view,"build/settings-amethyste.png");
   ThemeService.preview(Theme.NEON.colors());view.applyCss();view.layout();snapshot(view,"build/settings-neon.png");
   ThemeService.preview(Theme.AMETHYSTE.colors());return null;
@@ -100,7 +115,7 @@ class ThemeViewsTest {
    alert.getDialogPane().getScene().getStylesheets().addAll(scene.getStylesheets());
    alert.getDialogPane().applyCss();
    alert.show();alert.getDialogPane().applyCss();
-   assertEquals(Color.web(Theme.NEON.colors().get(ThemeColor.TEXT)),((Label)alert.getDialogPane().lookup(".label")).getTextFill());
+   assertEquals(Color.web("#F4F5F7"),((Label)alert.getDialogPane().lookup(".label")).getTextFill());
    picker.show();
    for(var window:javafx.stage.Window.getWindows())window.getScene().getRoot().applyCss();
    ThemeService.preview(Theme.AMBRE.colors());

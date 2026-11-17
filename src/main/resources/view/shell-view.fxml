@@ -3,8 +3,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.geometry.Insets?>
-<BorderPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="be.cookies.studio.core.controller.ShellController" styleClass="app-shell" fx:id="shellRoot">
- <left><ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="sidebar-scroll" fx:id="sidebarScroll" prefWidth="232" minWidth="232" maxWidth="232">
+<?import be.cookies.studio.core.ui.ImmersiveShell?>
+<ImmersiveShell xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="be.cookies.studio.core.controller.ShellController" styleClass="app-shell" fx:id="shellRoot"><padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+ <left><ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="sidebar-scroll" fx:id="sidebarScroll" prefWidth="224" minWidth="224" maxWidth="224">
  <content><VBox styleClass="sidebar" fx:id="sidebarContent" spacing="8" minHeight="0">
   <HBox alignment="CENTER_LEFT" spacing="12" styleClass="brand">
    <ImageView fitWidth="36" fitHeight="36" preserveRatio="true"><image><Image url="@../images/logo/logo-core.png"/></image></ImageView>
@@ -20,6 +21,7 @@
   <Label text="TON ESPACE" styleClass="nav-caption"/>
   <Button fx:id="settingsButton" text="Paramètres" maxWidth="Infinity" styleClass="nav-button"/>
   <Button fx:id="accountButton" text="Compte Minecraft" maxWidth="Infinity" styleClass="nav-button"/>
+  <Button text="Informations et licences" onAction="#showInformation" maxWidth="Infinity" styleClass="nav-button"/>
  </VBox></content></ScrollPane></left>
  <center><BorderPane fx:id="contentContainer" minWidth="0" styleClass="page-host"/></center>
-</BorderPane>
+</ImmersiveShell>

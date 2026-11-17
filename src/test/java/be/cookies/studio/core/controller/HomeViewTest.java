@@ -24,10 +24,9 @@ class HomeViewTest {
    assertTrue(((Label)root.lookup("#lastInstanceStatus")).getText().contains("absente"));
    root.applyCss();root.layout();
    var banner=(javafx.scene.layout.StackPane)root.lookup("#bannerPane");
-   var artwork=(javafx.scene.image.ImageView)banner.getChildren().getFirst();
-   assertTrue(artwork.viewportProperty().isBound(), "Fallback must also be cropped");
-   assertNotNull(artwork.getViewport());
-   assertEquals(banner.getWidth()/banner.getHeight(), artwork.getViewport().getWidth()/artwork.getViewport().getHeight(), 0.0001);
+   var requested=new java.util.ArrayList<String>();controller.setArtworkConsumer(requested::add);
+   assertEquals(instance.getImagePath(),requested.getLast(),"Le fond est délégué au shell immersif");
+   assertTrue(banner.getChildren().stream().noneMatch(n->n instanceof javafx.scene.image.ImageView));
    var shot=root.snapshot(null,null);var output=new java.awt.image.BufferedImage((int)shot.getWidth(),(int)shot.getHeight(),java.awt.image.BufferedImage.TYPE_INT_ARGB);
    for(int y=0;y<output.getHeight();y++)for(int x=0;x<output.getWidth();x++)output.setRGB(x,y,shot.getPixelReader().getArgb(x,y));
    javax.imageio.ImageIO.write(output,"png",new java.io.File("build/home-preview.png"));

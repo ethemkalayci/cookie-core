@@ -3,24 +3,28 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="home-scroll" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="be.cookies.studio.core.controller.SettingsController">
-<content><VBox fx:id="settingsContent" spacing="22" styleClass="page,settings-page">
+<content><StackPane alignment="TOP_CENTER" minWidth="0"><VBox fx:id="settingsContent" spacing="22" styleClass="page,settings-page" maxWidth="1100" minWidth="0" maxHeight="-Infinity">
 <VBox spacing="6"><Label text="À TA FAÇON" styleClass="eyebrow"/>
 <Label text="Paramètres" styleClass="page-title"/>
 <Label text="Personnalise ton interface et prépare tes prochaines sessions." wrapText="true" styleClass="page-description"/></VBox><Label fx:id="status" wrapText="true" styleClass="status-message"/>
-<TabPane tabClosingPolicy="UNAVAILABLE">
+<TabPane tabClosingPolicy="UNAVAILABLE" minHeight="-Infinity">
 <tabs>
-<Tab text="Apparence"><content><VBox spacing="20">
+<Tab text="Apparence"><content><VBox spacing="20" minHeight="-Infinity">
 <padding><Insets top="24" right="12" bottom="24" left="12"/></padding>
+<Label text="Confort visuel" styleClass="settings-heading"/>
+<CheckBox fx:id="reducedMotion" text="Réduire les animations"/>
+<CheckBox fx:id="reducedTransparency" text="Réduire la transparence"/>
+<Separator/>
 <Label text="Thème actif" styleClass="settings-heading"/>
 <ComboBox fx:id="themes" prefWidth="340"/>
-<Label text="Le thème choisi est appliqué immédiatement et conservé au redémarrage." wrapText="true" styleClass="muted"/>
+<Label text="Les accents sont appliqués immédiatement et conservés au redémarrage. Le verre dépoli reprend une teinte discrète du thème pour garder des textes lisibles." wrapText="true" styleClass="muted"/>
 <Separator/>
 <Label text="Créer ou modifier un thème personnel" styleClass="settings-heading"/>
 <Label text="Les huit thèmes officiels restent intacts. Les modifications ci-dessous sont prévisualisées jusqu'à leur enregistrement." wrapText="true"/>
 <FlowPane hgap="14" vgap="12"><Label text="Palette de base"/><ComboBox fx:id="baseTheme" prefWidth="180"/><TextField fx:id="themeName" promptText="Nom de ton thème" prefWidth="230"/></FlowPane>
 <Label fx:id="contrastWarning" wrapText="true" styleClass="warning"/>
-<FlowPane hgap="12" vgap="12"><Button text="Enregistrer le thème" onAction="#saveTheme"/><Button styleClass="secondary-button" text="Annuler l'aperçu" onAction="#cancelPreview"/><Button styleClass="secondary-button" text="Réinitialiser toutes les couleurs" onAction="#resetAll"/><Button styleClass="secondary-button" fx:id="deleteTheme" text="Supprimer le thème personnel" onAction="#deleteTheme"/></FlowPane>
-<VBox fx:id="colorRows" spacing="12"/>
+<FlowPane hgap="12" vgap="12"><Button wrapText="true" text="Enregistrer le thème" onAction="#saveTheme"/><Button wrapText="true" styleClass="secondary-button" text="Annuler l'aperçu" onAction="#cancelPreview"/><Button wrapText="true" styleClass="secondary-button" text="Réinitialiser toutes les couleurs" onAction="#resetAll"/><Button wrapText="true" styleClass="secondary-button" fx:id="deleteTheme" text="Supprimer le thème personnel" onAction="#deleteTheme"/></FlowPane>
+<TitledPane minHeight="-Infinity" fx:id="palettePane" text="Palette complète et couleurs conservées" expanded="false" animated="false"><content><VBox spacing="16" minHeight="-Infinity"><Label minHeight="-Infinity" text="Modifie une couleur avec le sélecteur ou son code hexadécimal. Les couleurs historiques restent conservées." wrapText="true" styleClass="muted"/><ScrollPane fx:id="paletteScroll" fitToWidth="true" prefHeight="480" minHeight="480" maxHeight="480" hbarPolicy="NEVER" styleClass="palette-scroll"><content><VBox fx:id="colorRows" spacing="10" minHeight="-Infinity"/></content></ScrollPane></VBox></content></TitledPane>
 </VBox></content></Tab>
 <Tab text="Minecraft et stockage"><content><VBox spacing="20">
 <padding><Insets top="24" right="12" bottom="24" left="12"/></padding>
@@ -32,17 +36,17 @@
 <Label fx:id="ramValue"/>
 <Label text="Reprendre explicitement la gestion mémoire d’une instance existante" wrapText="true"/>
 <ComboBox fx:id="memoryTarget" promptText="Choisir une instance installée" maxWidth="650"/>
-<Button text="Utiliser le défaut enregistré pour cette instance" onAction="#adoptMemory"/>
+<Button wrapText="true" text="Utiliser le défaut enregistré pour cette instance" onAction="#adoptMemory"/>
 <Label text="Les réglages mémoire personnalisés dans Prism pour une instance restent prioritaires. Désactiver cette option laisse les réglages existants inchangés. Une nouvelle valeur est appliquée au prochain lancement ; ferme d'abord le Prism de Cookie Core s'il est ouvert." wrapText="true" styleClass="muted"/>
 </VBox>
 <VBox spacing="14" styleClass="settings-card,surface-card">
 <Label text="Dossier des nouvelles instances" styleClass="settings-heading"/>
 <TextField fx:id="installPath" promptText="Vide : utiliser le dossier par défaut"/>
 <Label fx:id="defaultPath" wrapText="true" styleClass="muted"/>
-<FlowPane hgap="12" vgap="12"><Button text="Choisir un dossier…" onAction="#chooseDirectory"/><Button text="Revenir au dossier par défaut" onAction="#defaultDirectory"/></FlowPane>
+<FlowPane hgap="12" vgap="12"><Button wrapText="true" text="Choisir un dossier…" onAction="#chooseDirectory"/><Button wrapText="true" text="Revenir au dossier par défaut" onAction="#defaultDirectory"/></FlowPane>
 <Label text="Seules les nouvelles installations utilisent ce dossier. Les instances et sauvegardes existantes restent à leur emplacement. Sous Windows, un lien de dossier permet à Prism de retrouver chaque nouvelle instance." wrapText="true"/>
 </VBox>
-<Button text="Enregistrer Minecraft et stockage" onAction="#saveMinecraft"/>
+<Button wrapText="true" text="Enregistrer Minecraft et stockage" onAction="#saveMinecraft"/>
 </VBox></content></Tab>
 </tabs></TabPane>
-</VBox></content></ScrollPane>
+</VBox></StackPane></content></ScrollPane>

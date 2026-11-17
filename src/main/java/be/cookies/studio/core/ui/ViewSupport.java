@@ -14,6 +14,17 @@ import javafx.util.Duration;
 public final class ViewSupport {
     private ViewSupport() {}
 
+    /** A full-width host with a readable, horizontally centered content column. */
+    public static javafx.scene.layout.StackPane centered(Region content, double maximumWidth) {
+        content.setMinWidth(0);
+        content.setMaxWidth(maximumWidth);
+        content.setMaxHeight(Region.USE_PREF_SIZE);
+        var host = new javafx.scene.layout.StackPane(content);
+        host.setAlignment(javafx.geometry.Pos.TOP_CENTER);
+        host.setMinWidth(0);
+        return host;
+    }
+
     public static void rounded(Region region,double radius) {
         Rectangle clip=new Rectangle();clip.setArcWidth(radius*2);clip.setArcHeight(radius*2);
         clip.widthProperty().bind(region.widthProperty());clip.heightProperty().bind(region.heightProperty());region.setClip(clip);
@@ -36,7 +47,7 @@ public final class ViewSupport {
     }
 
     public static FadeTransition reveal(Node page) {
-        FadeTransition fade = new FadeTransition(Duration.millis(160), page);
+        FadeTransition fade = new FadeTransition(Duration.millis(be.cookies.studio.core.service.ThemeService.reducedMotion()?1:160), page);
         fade.setFromValue(.65); fade.setToValue(1);
         fade.setInterpolator(Interpolator.EASE_OUT); fade.play();
         return fade;
@@ -46,6 +57,7 @@ public final class ViewSupport {
         TranslateTransition transition = new TranslateTransition(Duration.millis(140), card);
         transition.setInterpolator(Interpolator.EASE_OUT);
         card.hoverProperty().addListener((observable, oldValue, hovered) -> {
+            if(be.cookies.studio.core.service.ThemeService.reducedMotion()){card.setTranslateY(0);return;}
             transition.stop(); transition.setToY(hovered ? -2 : 0); transition.play();
         });
         card.sceneProperty().addListener((observable, before, after) -> {

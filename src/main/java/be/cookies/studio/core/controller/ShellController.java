@@ -33,6 +33,7 @@ public class ShellController {
             catch (ReflectiveOperationException error) { throw new IllegalStateException(error); }
         });
     }
+    private long pageGeneration;
     private void present(Parent page) {
         if (pageTransition != null) { pageTransition.stop(); pageTransition.getNode().setOpacity(1); }
         contentContainer.setCenter(page);
@@ -113,6 +114,8 @@ public class ShellController {
 
     private void showAccount(Runnable afterConnection) {
         if (settingsController != null) { settingsController.dispose(); settingsController = null; }
+        ++pageGeneration;
+        ((be.cookies.studio.core.ui.ImmersiveShell)shellRoot).showArtwork(null);
         selectButton(accountButton);
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/account-view.fxml"));
@@ -135,6 +138,7 @@ public class ShellController {
     }
 
     private void loadView(String fileName){
+        long request=++pageGeneration;
         if (settingsController != null) { settingsController.dispose(); settingsController = null; }
         URL ressource = getClass().getResource("/view/"+fileName);
         if (ressource == null){
@@ -149,21 +153,31 @@ public class ShellController {
             if (fileName.equals("home-view.fxml")) {
                 HomeController homeController = file.getController();
                 homeController.setHostServices(hostServices);
+                homeController.setArtworkConsumer(path -> {if(request==pageGeneration)((be.cookies.studio.core.ui.ImmersiveShell)shellRoot).showArtwork(path);});
                 homeController.setInstanceActions(() -> { selectButton(instancesButton); loadView("instance-view.fxml"); }, this::showAccount);
             }
 
             if (file.getController() instanceof InstanceController controller) {
+                controller.setArtworkConsumer(path -> {if(request==pageGeneration)((be.cookies.studio.core.ui.ImmersiveShell)shellRoot).showArtwork(path);});
                 controller.setAccountRequest(this::showAccount);
                 controller.setOnLaunched(() -> { selectButton(accueilButton); loadView("home-view.fxml"); });
             }
             if (file.getController() instanceof VanillaController controller) controller.setAccountRequest(this::showAccount);
             if (file.getController() instanceof SettingsController controller) settingsController = controller;
+            if(!fileName.equals("home-view.fxml") && !fileName.equals("instance-view.fxml"))((be.cookies.studio.core.ui.ImmersiveShell)shellRoot).showArtwork(null);
+            if(file.getController() instanceof DownloadsController controller)controller.setBrowse(() -> {selectButton(instancesButton);loadView("instance-view.fxml");});
             present(page);
         }catch (IOException e){
             e.printStackTrace();
         }
     }
 
+    @FXML private void showInformation(){
+        var dialog=new javafx.scene.control.Dialog<Void>();dialog.setTitle("Cookie Core — Informations et licences");dialog.initOwner(shellRoot.getScene().getWindow());
+        var text=new javafx.scene.control.Label("Cookie Core · Cookies Studio\nLauncher Minecraft Java Edition\n\nL’authentification Microsoft et le lancement sont assurés par Prism Launcher officiel.\n\nComposants : Java / OpenJDK, JavaFX, Gson et fxsvgimage. Les notices de distribution sont fournies avec le runtime et les bibliothèques.\n\nCookie Core n’est pas un produit officiel de Minecraft et n’est pas approuvé par Mojang ou Microsoft.");text.setWrapText(true);text.setMaxWidth(540);
+        var link=new javafx.scene.control.Hyperlink("Consulter le code et la licence de Prism Launcher");link.setOnAction(e->{if(hostServices!=null)hostServices.showDocument("https://github.com/PrismLauncher/PrismLauncher/blob/develop/LICENSE");});
+        dialog.getDialogPane().setContent(new javafx.scene.layout.VBox(20,text,link));dialog.getDialogPane().getButtonTypes().add(javafx.scene.control.ButtonType.CLOSE);be.cookies.studio.core.service.ThemeService.attach(dialog);dialog.show();
+    }
     private Group loadIcon(String fileName) {
         URL resource = getClass().getResource("/images/icones/" + fileName);
 

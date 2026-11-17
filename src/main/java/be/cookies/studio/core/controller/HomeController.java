@@ -11,10 +11,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.TilePane;
 import org.girod.javafx.svgimage.SVGLoader;
-import javafx.scene.Node;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.Region;
-import javafx.scene.shape.Rectangle;
 import be.cookies.studio.core.service.NewsLoadResult;
 import java.io.IOException;
 import java.net.URL;
@@ -37,18 +35,11 @@ public class HomeController {
     private boolean lastInstalled, launching;
     private be.cookies.studio.core.model.LocalInstance localLast;
     private java.time.Instant localLastAt;
-    private javafx.scene.image.ImageView lastImage;
+
     public void setInstanceActions(Runnable browse, java.util.function.Consumer<Runnable> account) {
         browseInstances = browse; accountRequest = account;
     }
     private void loadLastInstance() {
-        lastImage = new javafx.scene.image.ImageView();
-        lastImage.setManaged(false); lastImage.setMouseTransparent(true);
-        lastImage.fitWidthProperty().bind(bannerPane.widthProperty());
-        lastImage.fitHeightProperty().bind(bannerPane.heightProperty());
-        bannerPane.getChildren().addFirst(lastImage);
-        var clip = new Rectangle(); clip.widthProperty().bind(bannerPane.widthProperty());
-        clip.heightProperty().bind(bannerPane.heightProperty()); lastImage.setClip(clip);
         if (!backgroundLoading) { showLastInstance(null); return; }
         lastInstancePlay.setDisable(true);
         Task<be.cookies.studio.core.service.LastInstanceService.Entry> task = new Task<>() {
@@ -76,6 +67,7 @@ public class HomeController {
     void showLastInstance(be.cookies.studio.core.service.LastInstanceService.Entry entry) {
         lastEntry = entry;
         if (entry == null) {
+            showLastImage(null);
             lastInstanceSubtitle.setText("TON AVENTURE COMMENCE ICI");
             lastInstanceName.setText("Choisis ton aventure");
             lastInstanceVersions.setText("Retrouve ici ta dernière instance après son premier lancement.");
@@ -88,7 +80,7 @@ public class HomeController {
         lastInstanceVersions.setText("Minecraft " + i.getMinecraftVersion() + "  •  " + loader + "  •  Pack " + i.getModpackVersion());
         lastInstanceDate.setText("Dernier lancement demandé : " + java.time.format.DateTimeFormatter
                 .ofPattern("dd/MM/yyyy à HH:mm").withZone(java.time.ZoneId.systemDefault()).format(entry.launchedAt()));
-        lastInstanceStatus.setText(lastInstalled ? "Prête à jouer" : "Instance absente ou modifiée — retrouve-la dans Instances.");
+        lastInstanceStatus.setText(lastInstalled ? "" : "Instance absente ou modifiée — retrouve-la dans Instances.");
         lastInstancePlay.setText(lastInstalled ? "REJOUER" : "VOIR LES INSTANCES");
         showInstanceImage(i.getImagePath(), i);
     }
@@ -96,7 +88,7 @@ public class HomeController {
         lastInstanceSubtitle.setText("DERNIÈRE INSTANCE LANCÉE");lastInstanceName.setText(localLast.name());
         lastInstanceVersions.setText("Minecraft "+localLast.minecraft()+" · "+localLast.loader()+" "+java.util.Objects.toString(localLast.loaderVersion(),"")+" · "+(localLast.official()==null?"Personnelle":"Pack "+localLast.official().getModpackVersion()));
         lastInstanceDate.setText("Dernier lancement demandé : "+java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy à HH:mm").withZone(java.time.ZoneId.systemDefault()).format(localLastAt));
-        lastInstanceStatus.setText(lastInstalled?"Prête à jouer":"Emplacement indisponible ou récupération nécessaire — ouvre la bibliothèque locale.");
+        lastInstanceStatus.setText(lastInstalled?"":"Emplacement indisponible ou récupération nécessaire — ouvre la bibliothèque locale.");
         lastInstancePlay.setText(lastInstalled?"REJOUER":"VOIR LES INSTANCES");showInstanceImage(localLast.image(), localLast.official());
     }
     private long artworkRequest;
@@ -122,42 +114,10 @@ public class HomeController {
         // Keep the local illustration or fallback if the catalog is unavailable.
         startWorker(task, "home-instance-artwork");
     }
-    private long imageRequest;
-    private void showLastImage(String path) {
-        long request = ++imageRequest;
-        var fallback = new javafx.scene.image.Image(getClass().getResource("/images/banners/mc.jpg").toExternalForm());
-        displayCroppedImage(fallback);
-        if (path == null || path.isBlank()) return;
-        if (path.startsWith("https://")) {
-            new be.cookies.studio.core.service.NewsImageCacheService().resolve(path).whenComplete((file,error) ->
-                javafx.application.Platform.runLater(() -> {
-                    if (error == null && file != null && request == imageRequest)
-                        loadLocalImage(file.toUri().toString(), request);
-                }));
-        } else loadLocalImage(path, request);
-    }
-    private void loadLocalImage(String path, long request) {
-        try {
-            var picture = new javafx.scene.image.Image(path, true);
-            Runnable ready = () -> {
-                if (request == imageRequest && !picture.isError() && picture.getProgress() >= 1)
-                    displayCroppedImage(picture);
-            };
-            picture.progressProperty().addListener((o, before, after) -> ready.run());
-            ready.run();
-        } catch (IllegalArgumentException ignored) { /* Retain the cropped fallback. */ }
-    }
-    private void displayCroppedImage(javafx.scene.image.Image picture) {
-        lastImage.viewportProperty().unbind();
-        lastImage.setImage(picture);
-        lastImage.viewportProperty().bind(javafx.beans.binding.Bindings.createObjectBinding(() -> {
-            double w=picture.getWidth(), h=picture.getHeight(), bw=bannerPane.getWidth(), bh=bannerPane.getHeight();
-            if(w<=0 || h<=0 || bw<=0 || bh<=0) return null;
-            double ratio=bw/bh;
-            return w/h>ratio ? new javafx.geometry.Rectangle2D((w-h*ratio)/2,0,h*ratio,h)
-                    : new javafx.geometry.Rectangle2D(0,(h-w/ratio)/2,w,w/ratio);
-        }, picture.widthProperty(), picture.heightProperty(), bannerPane.widthProperty(), bannerPane.heightProperty()));
-    }
+    private String artworkPath;
+    private java.util.function.Consumer<String> artworkConsumer=path -> {};
+    public void setArtworkConsumer(java.util.function.Consumer<String> consumer){artworkConsumer=consumer;consumer.accept(artworkPath);}
+    private void showLastImage(String path){artworkPath=path;artworkConsumer.accept(path);}
     @FXML private void playLastInstance() {
         if (launching) return;
         if ((lastEntry == null && localLast == null) || !lastInstalled) { browseInstances.run(); return; }

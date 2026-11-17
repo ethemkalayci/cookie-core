@@ -4,22 +4,21 @@
 <?import javafx.scene.image.*?>
 <?import javafx.geometry.Insets?>
 <ScrollPane fx:id="instanceScrollPane" fitToWidth="true" hbarPolicy="NEVER" styleClass="instance-scroll" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="be.cookies.studio.core.controller.InstanceController">
- <content><VBox spacing="24" styleClass="page">
+ <content><StackPane alignment="TOP_CENTER" minWidth="0"><VBox spacing="24" styleClass="page,instances-page" maxWidth="Infinity" minWidth="0" maxHeight="-Infinity">
+  <VBox spacing="8"><Label text="TA BIBLIOTHÈQUE" styleClass="eyebrow"/><Label text="Instances" styleClass="page-title"/>
+  <ComboBox fx:id="instanceSelector" promptText="Choisir une instance officielle" accessibleText="Instance officielle sélectionnée" maxWidth="420"/></VBox>
   <FlowPane fx:id="catalogNotice" visible="false" managed="false" hgap="12" vgap="8"><Label fx:id="catalogStatus" wrapText="true"/><Button fx:id="retryCatalogButton" text="Réessayer"/></FlowPane>
-  <StackPane fx:id="bannerPane" prefHeight="420" minHeight="360" styleClass="instance-banner">
-   <Pane fx:id="slidesContainer" mouseTransparent="true"><children>
-    <StackPane fx:id="currentSlide">
-     <ImageView fx:id="instanceBannerImage" preserveRatio="true" smooth="true" mouseTransparent="true"/>
-     <Region mouseTransparent="true" styleClass="banner-gradient"/>
-   <Region mouseTransparent="true" prefHeight="200" maxHeight="200" styleClass="banner-bottom-fade" StackPane.alignment="BOTTOM_CENTER"/>
+  <StackPane fx:id="bannerPane" prefHeight="420" minHeight="300" styleClass="instance-banner">
+
+
+
      <VBox alignment="CENTER_LEFT" spacing="12" maxHeight="-Infinity" maxWidth="600" styleClass="hero-copy" StackPane.alignment="CENTER_LEFT">
       <StackPane.margin><Insets left="24" right="24" bottom="64" top="24"/></StackPane.margin>
       <Label fx:id="instanceNameLabel" text="Chargement…" styleClass="instance-title" wrapText="true" minHeight="-Infinity"/>
       <Label fx:id="instanceVersionLabel" styleClass="instance-version" wrapText="true" minHeight="-Infinity"/>
      </VBox>
-    </StackPane>
-   </children></Pane>
-   <HBox fx:id="navigationOverlay" alignment="CENTER_LEFT" spacing="12" maxHeight="-Infinity" styleClass="hero-toolbar" StackPane.alignment="BOTTOM_CENTER">
+
+   <HBox fx:id="navigationOverlay" alignment="CENTER_LEFT" spacing="12" maxHeight="-Infinity" styleClass="hero-toolbar,instance-launch-actions" StackPane.alignment="BOTTOM_CENTER">
     <Button fx:id="instancePlayButton" text="Installer" styleClass="instance-play-button" wrapText="true"/>
     <Region HBox.hgrow="ALWAYS" minWidth="0"/>
     <Button fx:id="previousInstanceButton" text="‹" accessibleText="Instance précédente" styleClass="instance-arrow"/>
@@ -27,20 +26,24 @@
    </HBox>
   </StackPane>
   <VBox spacing="6"><Label fx:id="operationStatus" wrapText="true"/><ProgressBar fx:id="instanceProgress" visible="false" managed="false" maxWidth="Infinity"/></VBox>
-  <VBox spacing="12" styleClass="surface-card">
-   <Label text="Personnaliser ton expérience" styleClass="section-title"/>
-   <FlowPane hgap="12" vgap="12" styleClass="instance-actions,content-tabs">
-    <Button text="Mods" onAction="#manageMods" styleClass="secondary-button"/><Button text="Resource Packs" onAction="#manageResourcePacks" styleClass="secondary-button"/><Button text="Shaders" onAction="#manageShaders" styleClass="secondary-button"/>
+  <StackPane alignment="TOP_CENTER" minWidth="0"><VBox maxWidth="1368" minWidth="0" spacing="24">
+  <VBox spacing="20" styleClass="instance-customization">
+   <FlowPane hgap="24" vgap="12" alignment="CENTER_LEFT">
+    <Label text="Contenus de l’instance" styleClass="section-title"/>
+    <Button text="Gérer l’instance" onAction="#manageSelected" styleClass="secondary-button"><tooltip><Tooltip text="Mise à jour, sauvegarde, déplacement et réglages"/></tooltip></Button>
+   </FlowPane>
+   <FlowPane hgap="8" vgap="8" styleClass="instance-actions,content-tabs">
+    <Button text="Mods" onAction="#manageMods" styleClass="secondary-button"/>
+    <Button text="Resource Packs" onAction="#manageResourcePacks" styleClass="secondary-button"/>
+    <Button text="Shaders" onAction="#manageShaders" styleClass="secondary-button"/>
    </FlowPane>
    <VBox fx:id="inlineContentsHost"/>
-   <Separator/>
-   <Button text="Gérer l’instance" onAction="#manageSelected" styleClass="secondary-button"/>
-   <Label text="Mise à jour, déplacement, sauvegarde et configuration de cette instance." wrapText="true" styleClass="muted"/>
   </VBox>
   <VBox spacing="16" styleClass="personal-instances-section">
-   <FlowPane hgap="24" vgap="12"><Label text="Mes instances" styleClass="section-title"/><Button fx:id="addInstanceButton" text="Créer" styleClass="secondary-button"/></FlowPane>
+   <FlowPane hgap="24" vgap="12"><Label text="Mes instances" styleClass="section-title"/><Button fx:id="addInstanceButton" text="Créer" styleClass="secondary-button"/><Button text="Importer ou gérer" onAction="#openPersonalLibrary" styleClass="secondary-button"/></FlowPane>
    <Label fx:id="localStatus" text="Chargement des installations locales…" wrapText="true" styleClass="muted"/>
-   <TilePane fx:id="personalInstancesGrid" hgap="20" vgap="20" prefColumns="3"/>
+   <TilePane minWidth="0" alignment="TOP_CENTER" fx:id="personalInstancesGrid" hgap="20" vgap="20" prefColumns="3"/>
   </VBox>
- </VBox></content>
+ </VBox></StackPane>
+ </VBox></StackPane></content>
 </ScrollPane>

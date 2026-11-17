@@ -16,6 +16,7 @@ public final class ThemeService {
     /** Initialize dialogs before show() triggers their first CSS sizing pass. */
     public static void attach(javafx.scene.control.Dialog<?> dialog){
         var pane=dialog.getDialogPane();
+        pane.setMinWidth(420);dialog.setResizable(true);
         roots.put(pane,true);apply(pane);
         if(!pane.getStylesheets().contains(css()))pane.getStylesheets().add(css());
     }
@@ -26,9 +27,40 @@ public final class ThemeService {
         active=Map.copyOf(copy);for(var root:List.copyOf(roots.keySet()))apply(root);
     }
     public static void restore(){preview(SettingsService.get().current().activeColors());}
+    public static boolean reducedMotion(){return SettingsService.get().current().reducedMotion();}
+    public static boolean reducedTransparency(){return SettingsService.get().current().reducedTransparency();}
+    public static Map<ThemeColor,String> renderedColors(Map<ThemeColor,String> saved){
+        var result=new EnumMap<ThemeColor,String>(saved);
+        for(var key:ThemeColor.values()) {
+            String neutral=switch(key){
+                case BACKGROUND, OVERLAY -> "#101216";
+                case SIDEBAR, CONTENT -> "#191C22";
+                case PANEL, CARD, NAV_INACTIVE, BUTTON_DISABLED -> "#23272F";
+                case NAV_HOVER -> "#333943";
+                case TEXT, ICON, BANNER_TEXT -> "#F4F5F7";
+                case TEXT_SECONDARY, TEXT_MUTED -> "#BDC4D0";
+                case BORDER, SEPARATOR -> "#454C59";
+                case SUCCESS -> "#78D6A3";
+                case WARNING -> "#F0C674";
+                case ERROR -> "#FF8795";
+                default -> null;
+            };
+            if(neutral!=null)result.put(key,neutral);
+        }
+        return result;
+    }
+    public static String foreground(String color){return contrast(color,"#FFFFFF")>=contrast(color,"#000000")?"#FFFFFF":"#000000";}
     private static void apply(Parent root){
-        var style=new StringBuilder();for(var key:ThemeColor.values())style.append(key.css()).append(':').append(active.get(key)).append(';');
+        var palette=renderedColors(active);var style=new StringBuilder();for(var key:ThemeColor.values())style.append(key.css()).append(':').append(palette.get(key)).append(';');
+        style.append("-cc-play-ink:").append(foreground(active.get(ThemeColor.PLAY))).append(';');
+        style.append("-cc-action-ink:").append(foreground(active.get(ThemeColor.BUTTON))).append(';');
+        style.append("-cc-selection-ink:").append(foreground(active.get(ThemeColor.SELECTION))).append(';');
+        var accent=javafx.scene.paint.Color.web(active.get(ThemeColor.ACCENT));
+        int red=(int)(28+accent.getRed()*32),green=(int)(31+accent.getGreen()*32),blue=(int)(39+accent.getBlue()*32);
+        style.append(String.format(java.util.Locale.ROOT,"-cc-material: rgba(%d,%d,%d,.78);-cc-material-solid: rgb(%d,%d,%d);-cc-wash: rgba(%d,%d,%d,.52);",red,green,blue,red,green,blue,red,green,blue));
         root.setStyle(style.toString());
+        root.pseudoClassStateChanged(javafx.css.PseudoClass.getPseudoClass("opaque"),reducedTransparency());
+        root.requestLayout();
     }
     public static double contrast(String a,String b){double x=luminance(a),y=luminance(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05);}
     private static double luminance(String value){int rgb=Integer.parseInt(value.substring(1),16);double sum=0;double[] weights={.2126,.7152,.0722};for(int i=0;i<3;i++){double c=((rgb>>(16-i*8))&255)/255.;sum+=weights[i]*(c<=.04045?c/12.92:Math.pow((c+.055)/1.055,2.4));}return sum;}
