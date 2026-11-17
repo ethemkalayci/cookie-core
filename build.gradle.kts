@@ -28,7 +28,7 @@ javafx {
 }
 
 application {
-    mainClass.set("be.cookies.studio.core.CookieCoreApp")
+    mainClass.set("be.cookies.studio.core.PackagedLauncher")
     applicationDefaultJvmArgs = listOf("--enable-native-access=javafx.graphics,javafx.media"    )
 }
 
@@ -50,7 +50,7 @@ tasks.test {
         Files.createDirectories(directory)
         systemProperty("java.io.tmpdir", directory.toRealPath().toString())
     }
-    inputs.property("windowsSmoke", providers.environmentVariable("COOKIE_CORE_WINDOWS_SMOKE").orElse("false"))
+
     testLogging {
         exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
         showExceptions = true
@@ -75,12 +75,26 @@ val packageInput by tasks.registering(Sync::class) {
     from(tasks.jar)
     from(configurations.runtimeClasspath)
 }
-tasks.register<Exec>("packageWindows") {
-    dependsOn(packageInput)
-    val jdk = javaToolchains.launcherFor(java.toolchain).get().metadata.installationPath.asFile
-    commandLine("powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "tools/update/Package.ps1",
-        "-Version", releaseVersion, "-Jdk", jdk.absolutePath)
-}
+// The fourth version component is reserved for Microsoft Store.
+require(releaseVersion.split('.').let { parts ->
+    parts.size == 3 && parts.all { it.toIntOrNull() in 0..65535 } && parts[0].toInt() > 0
+}) { "Store version must be MAJOR.MINOR.PATCH (major 1..65535, minor/patch 0..65535)" }
 
-// Opt-in smoke suite starts real packaged Windows apps in an isolated user-data root.
-tasks.test { if (System.getenv("COOKIE_CORE_WINDOWS_SMOKE") == "true") { maxParallelForks = 1 } }
+fun registerStorePackage(taskName: String, mode: String) = tasks.register<Exec>(taskName) {
+    group = "distribution"
+    description = "Build Windows x64 $mode with bundled Java 25 and JavaFX"
+    dependsOn(packageInput)
+    doFirst {
+        val jdk = javaToolchains.launcherFor(java.toolchain).get().metadata.installationPath.asFile
+        commandLine("powershell.exe", "-NoProfile", "-ExecutionPolicy", "RemoteSigned", "-File", "tools/store/Package.ps1",
+            "-Version", releaseVersion, "-Jdk", jdk.absolutePath, "-Mode", mode,
+            "-IdentityFile", providers.gradleProperty("storeIdentityFile").getOrElse("tools/store/identity.json"))
+    }
+}
+registerStorePackage("packageWindowsAppImage", "AppImage")
+registerStorePackage("packageMsix", "Msix")
+tasks.register<Exec>("testStorePackaging") {
+    group = "verification"
+    commandLine("powershell.exe", "-NoProfile", "-ExecutionPolicy", "RemoteSigned", "-File", "tools/store/Test-Packaging.ps1")
+}
+tasks.check { dependsOn("testStorePackaging") }

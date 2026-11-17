@@ -17,10 +17,23 @@ import java.net.URL;
 import java.util.Objects;
 
 public class CookieCoreApp extends Application {
-    @Override public void init() { be.cookies.studio.core.service.SettingsService.get(); }
+    private be.cookies.studio.core.service.LauncherSession session;
+    private String startupError;
+    @Override public void init() {
+        try { session = be.cookies.studio.core.service.LauncherSession.acquire(); }
+        catch (java.io.IOException error) { startupError = error.getMessage(); return; }
+        be.cookies.studio.core.service.SettingsService.get();
+    }
+    @Override public void stop() { if (session != null) session.close(); }
 
     @Override
     public void start(Stage stage) {
+        if (startupError != null) {
+            var alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
+            alert.setTitle("Cookie Core"); alert.setHeaderText("Lancement indisponible");
+            alert.setContentText(startupError); alert.showAndWait();
+            javafx.application.Platform.exit(); return;
+        }
         var logoUrl = getClass().getResource("/images/logo/logo-core.png");
 
         if (logoUrl == null) {
@@ -114,7 +127,7 @@ public class CookieCoreApp extends Application {
             stage.setMaximized(true);
             stage.setScene(scene);
             stage.show();
-            be.cookies.studio.core.update.UpdateUi.attach((javafx.scene.layout.BorderPane) root);
+
 
         } catch (Exception e) {
             throw new RuntimeException(

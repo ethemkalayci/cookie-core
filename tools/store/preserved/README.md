@@ -1,0 +1,3 @@
+# Copie préservée, hors compilation et hors package
+
+`UpdateFiles.java.txt` contient exactement le fichier local `src/main/java/be/cookies/studio/core/update/UpdateFiles.java` d'avant migration. Il présentait une modification utilisateur préexistante (fin de fichier). Cette copie évite de perdre cette modification pendant le retrait du package `update`. Aucun outil de build ne la compile, ne l'exécute ni ne l'embarque. Son SHA-256 a été comparé à la copie d'audit. Le propriétaire peut la supprimer personnellement après revue.

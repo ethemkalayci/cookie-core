@@ -76,5 +76,3 @@ public final class UpdateFiles {
             if(!Files.isRegularFile(target.resolve(required)))throw new IOException("Distribution incomplète: "+required);
     }
 }
-
-

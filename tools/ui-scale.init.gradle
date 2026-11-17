@@ -1,0 +1,6 @@
+allprojects {
+ tasks.withType(Test).configureEach {
+  def scale = System.getProperty('cookiecore.uiScale', '1.0')
+  jvmArgs "-Dglass.win.uiScale=${scale}", "-Dcookiecore.expectedScale=${scale}"
+ }
+}
